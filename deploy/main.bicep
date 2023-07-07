@@ -1,5 +1,5 @@
 @description('The name of the function app that you wish to create.')
-param appName string = 'fnapp${uniqueString(resourceGroup().id)}'
+param appName string = 'fnapp'
 
 @description('The Azure region into which the resources should be deployed.')
 param location string = resourceGroup().location
