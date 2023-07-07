@@ -1,8 +1,11 @@
 trigger: none
 
 variables:
-  buildConfiguration: 'Release'
-  releaseBranchName: 'main'
+- group: Release
+- name: buildConfiguration
+  value: Release
+- name: releaseBranchName
+  value: main
 
 # schedules:
 # - cron: '0 3 * * *'
