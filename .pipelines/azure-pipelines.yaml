@@ -73,6 +73,16 @@ stages:
   jobs:
   - job:
     steps:
+    # - task: AzureCLI@2
+    #   inputs:
+    #     azureSubscription: $(ServiceConnectionName)
+    #     scriptType: bash
+    #     scriptLocation: inlineScript
+    #     useGlobalConfig: false
+    #     inlineScript: |
+    #       az --version
+    #       az group create --name $(resourceGroupName) --location $(deploymentDefaultLocation)
+    #       az deployment group create --resource-group $(ResourceGroupName) --template-file deploy/main.bicep
     - task: AzureResourceManagerTemplateDeployment@3
       inputs:
         connectedServiceName: $(ServiceConnectionName)
@@ -81,21 +91,24 @@ stages:
         resourceGroupName: $(ResourceGroupName)
         csmFile: deploy/main.bicep
         csmParametersFile: deploy/parameters.json
-  # - deployment: Deploy
-  #   pool:
-  #     vmImage: 'ubuntu-20.04'
-  #   environment: dev
-  #   variables:
-  #   - group: Release
-  #   strategy:
-  #     runOnce:
-  #       deploy:
-  #         steps:
-  #         - download: current
-  #           artifact: drop
-  #         - task: AzureWebApp@1
-  #           displayName: 'Azure App Service Deploy: website'
-  #           inputs:
-  #             azureSubscription: 'Resource Manager - Tailspin - Space Game'
-  #             appName: '$(WebAppNameDev)'
-  #             package: '$(Pipeline.Workspace)/drop/$(buildConfiguration)/*.zip'
+
+  - deployment: Deploy
+    pool:
+      vmImage: 'ubuntu-20.04'
+    environment: dev
+    variables:
+    - group: Release
+    strategy:
+      runOnce:
+        deploy:
+          steps:
+          - download: current
+            artifact: drop
+          - task: AzureFunctionApp@1
+            displayName: 'Azure App Service Deploy: website'
+            inputs:
+              azureSubscription: $(ServiceConnectionName)
+              appName: 'fnapp-gzzmowgey3iem'
+              appType: 'functionApp'
+              package: '$(Pipeline.Workspace)/drop/$(buildConfiguration)/*.zip'
+              deploymentMethod: 'zipDeploy' 
