@@ -1,5 +1,6 @@
 # Reference 
 https://learn.microsoft.com/en-us/training/modules/build-first-bicep-deployment-pipeline-using-azure-pipelines/
+https://learn.microsoft.com/en-us/azure/azure-functions/functions-create-first-function-bicep?tabs=CLI
 
 ## 1 Prerequisites 
 

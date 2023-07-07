@@ -1,82 +1,105 @@
+@description('The name of the function app that you wish to create.')
+param appName string = 'fnapp${uniqueString(resourceGroup().id)}'
+
 @description('The Azure region into which the resources should be deployed.')
 param location string = resourceGroup().location
 
-@description('The type of environment. This must be nonprod or prod.')
+@description('Storage Account type')
 @allowed([
-  'nonprod'
-  'prod'
+  'Standard_LRS'
+  'Standard_GRS'
+  'Standard_RAGRS'
 ])
-param environmentType string
+param storageAccountType string = 'Standard_LRS'
 
-@description('Indicates whether to deploy the storage account')
-param deployStorageAccount bool = false
+@description('The language worker runtime to load in the function app.')
+@allowed([
+  'node'
+  'dotnet'
+  'java'
+])
+param runtime string = 'dotnet'
+
+// @description('Location for Application Insights')
+// param appInsightsLocation string
 
 @description('A unique suffix to add to resource names that need to be globally unique.')
 @maxLength(13)
 param resourceNameSuffix string = uniqueString(resourceGroup().id)
 
-var appServiceAppName = 'azure-samples-${resourceNameSuffix}'
-var appServicePlanName = 'azure-samples-plan'
-var azureSamplesStorageAccountName = 'azuresamples${resourceNameSuffix}'
 
-// Define the SKUs for each component based on the environment type.
-var environmentConfigurationMap = {
-  nonprod: {
-    appServicePlan: {
-      sku: {
-        name: 'F1'
-        capacity: 1
-      }
-    }
-    azureSamplesStorageAccount: {
-      sku: {
-        name: 'Standard_LRS'
-      }
-    }
+var appServicePlanName = '${appName}-plan'
+var storageAccountName = '${appName}${resourceNameSuffix}'
+var functionAppName = '${appName}-${resourceNameSuffix}'
+var functionWorkerRuntime = runtime
+var applicationInsightsName = appName
+
+
+resource storageAccount 'Microsoft.Storage/storageAccounts@2022-05-01' = {
+  name: storageAccountName
+  location: location
+  sku: {
+    name: storageAccountType
   }
-  prod: {
-    appServicePlan: {
-      sku: {
-        name: 'S1'
-        capacity: 2
-      }
-    }
-    azureSamplesStorageAccount: {
-      sku: {
-        name: 'Standard_ZRS'
-      }
-    }
+  kind: 'Storage'
+  properties: {
+    supportsHttpsTrafficOnly: true
+    defaultToOAuthAuthentication: true
   }
 }
-
-var azureSamplesStorageAccountConnectionString = deployStorageAccount ? 'DefaultEndpointsProtocol=https;AccountName=${azureSamplesStorageAccount.name};EndpointSuffix=${environment().suffixes.storage};AccountKey=${azureSamplesStorageAccount.listKeys().keys[0].value}' : ''
 
 resource appServicePlan 'Microsoft.Web/serverfarms@2022-03-01' = {
   name: appServicePlanName
   location: location
-  sku: environmentConfigurationMap[environmentType].appServicePlan.sku
+  sku: {
+    name: 'F1'
+    capacity: 1
+  }
 }
 
-resource appServiceApp 'Microsoft.Web/sites@2022-03-01' = {
-  name: appServiceAppName
+resource functionApp 'Microsoft.Web/sites@2021-03-01' = {
+  name: functionAppName
   location: location
+  kind: 'functionapp'
+  identity: {
+    type: 'SystemAssigned'
+  }
   properties: {
     serverFarmId: appServicePlan.id
     httpsOnly: true
     siteConfig: {
       appSettings: [
         {
-          name: 'AzureSamplesStorageAccountConnectionString'
-          value: azureSamplesStorageAccountConnectionString
+          name: 'AzureWebJobsStorage'
+          value: 'DefaultEndpointsProtocol=https;AccountName=${storageAccountName};EndpointSuffix=${environment().suffixes.storage};AccountKey=${storageAccount.listKeys().keys[0].value}'
+        }
+        {
+          name: 'WEBSITE_CONTENTAZUREFILECONNECTIONSTRING'
+          value: 'DefaultEndpointsProtocol=https;AccountName=${storageAccountName};EndpointSuffix=${environment().suffixes.storage};AccountKey=${storageAccount.listKeys().keys[0].value}'
+        }
+        {
+          name: 'WEBSITE_CONTENTSHARE'
+          value: toLower(functionAppName)
+        }
+        {
+          name: 'FUNCTIONS_EXTENSION_VERSION'
+          value: '~4'
+        }
+        {
+          name: 'WEBSITE_NODE_DEFAULT_VERSION'
+          value: '~14'
+        }
+        // {
+        //   name: 'APPINSIGHTS_INSTRUMENTATIONKEY'
+        //   value: applicationInsights.properties.InstrumentationKey
+        // }
+        {
+          name: 'FUNCTIONS_WORKER_RUNTIME'
+          value: functionWorkerRuntime
         }
       ]
+      ftpsState: 'FtpsOnly'
+      minTlsVersion: '1.2'
     }
   }
-}
-
-resource azureSamplesStorageAccount 'Microsoft.Storage/storageAccounts@2022-09-01' = if (deployStorageAccount) {
-  name: azureSamplesStorageAccountName
-  location: location
-  kind: 'StorageV2'
-  sku: environmentConfigurationMap[environmentType].azureSamplesStorageAccount.sku
 }

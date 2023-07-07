@@ -8,7 +8,6 @@ variables:
 - name: deploymentDefaultLocation
   value: australiasoutheast
 
-
 jobs:
 - job:
   steps:
@@ -20,5 +19,4 @@ jobs:
       location: $(deploymentDefaultLocation)
       resourceGroupName: $(ResourceGroupName)
       csmFile: deploy/main.bicep
-      overrideParameters: >
-        -environmentType $(EnvironmentType)
+      csmParametersFile: deploy/parameters.json
