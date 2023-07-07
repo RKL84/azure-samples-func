@@ -19,8 +19,8 @@ Microsoft publishes an Azure Pipelines extension for Visual Studio Code. The ext
 1. If you created a new account, follow the prompts to create an Azure DevOps organization. Azure DevOps then prompts you to create a new project. Continue to the next step to set up the project.If you signed in to an existing Azure DevOps organization, select New project to create a new project.
 1. In the Create a project to get started pane, enter the following details for your new project:
 
-* Project name: Use a meaningful but short name. For this exercise, enter `azure-func-httptrigger`.
-* Description: Enter a description of the project's purpose. For this exercise, enter `azure-func-httptrigger`.
+* Project name: Use a meaningful but short name. For this exercise, enter `AzureSamples`.
+* Description: Enter a description of the project's purpose. For this exercise, enter `AzureSamples`.
 * Visibility: You can use Azure DevOps to create public and private repositories. In this case, the repository should be private because your company website files should be accessed only by people within your organization. You can grant access to other users later.
 
 
@@ -54,10 +54,10 @@ Microsoft publishes an Azure Pipelines extension for Visual Studio Code. The ext
     az configure --defaults location=australiasoutheast
     ```
 
-1. Use a `az group create` command to create a resource group named *rg-azure-samples*.
+1. Use a `az group create` command to create a resource group named *azure-samples-rg*.
 
     ```azurecli
-    az group create --name azure-samples-rg site --location australiasoutheast
+    az group create --name azure-samples-rg --location australiasoutheast
     ```
 
 ## 5 Add Bicep file to create the resources
