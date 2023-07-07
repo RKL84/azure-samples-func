@@ -9,7 +9,7 @@ param location string = resourceGroup().location
 param environmentType string
 
 @description('Indicates whether to deploy the storage account')
-param deployStorageAccount bool
+param deployStorageAccount bool = false
 
 @description('A unique suffix to add to resource names that need to be globally unique.')
 @maxLength(13)
