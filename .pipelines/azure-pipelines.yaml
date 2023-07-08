@@ -100,7 +100,8 @@ stages:
                 az group create --name $(resourceGroupName) --location $(deploymentDefaultLocation)
 
           - task: AzureResourceManagerTemplateDeployment@3
-            condition: succeeded()
+            displayName: 'Deploy ARM template'
+            # condition: succeeded()
             inputs:
               connectedServiceName: $(ServiceConnectionName)
               deploymentName: $(Build.BuildNumber)
@@ -111,7 +112,7 @@ stages:
               overrideParameters: -appName $(appName)
 
           - task: AzureFunctionApp@1
-            displayName: 'Azure App Service Deploy: function'
+            displayName: 'Upload zip file'
             condition: succeeded()
             inputs:
               azureSubscription: $(ServiceConnectionName)
