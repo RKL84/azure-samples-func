@@ -19,18 +19,19 @@ param storageAccountType string = 'Standard_LRS'
   'java'
 ])
 param runtime string = 'dotnet'
+param env string
 
 // @description('Location for Application Insights')
 // param appInsightsLocation string
 
-@description('A unique suffix to add to resource names that need to be globally unique.')
-@maxLength(13)
-param resourceNameSuffix string = uniqueString(resourceGroup().id)
+// @description('A unique suffix to add to resource names that need to be globally unique.')
+// @maxLength(13)
+// param resourceNameSuffix string = uniqueString(resourceGroup().id)
 
 
 var appServicePlanName = '${appName}-plan'
-var storageAccountName = '${appName}${resourceNameSuffix}'
-var functionAppName = '${appName}-${resourceNameSuffix}'
+var storageAccountName = 'st${appName}${env}'
+var functionAppName = 'func-${appName}-${env}'
 var functionWorkerRuntime = runtime
 var applicationInsightsName = appName
 

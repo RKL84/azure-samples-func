@@ -7,6 +7,10 @@ variables:
   value: Release
 - name: releaseBranchName
   value: main
+- name: deploymentDefaultLocation
+  value: australiasoutheast
+- name: appName
+  value: azsample0411
 
 # schedules:
 # - cron: '0 3 * * *'
@@ -82,7 +86,7 @@ stages:
         inlineScript: |
           az --version
           az group create --name $(resourceGroupName) --location $(deploymentDefaultLocation)
-          
+
     - task: AzureResourceManagerTemplateDeployment@3
       inputs:
         connectedServiceName: $(ServiceConnectionName)
@@ -90,7 +94,8 @@ stages:
         location: $(deploymentDefaultLocation)
         resourceGroupName: $(ResourceGroupName)
         csmFile: deploy/main.bicep
-        csmParametersFile: deploy/parameters.json
+        csmParametersFile: deploy/parameters.dev.json
+        overrideParameters: -appName $(appName)
 
   - deployment: Deploy
     pool:
@@ -105,10 +110,10 @@ stages:
           - download: current
             artifact: drop
           - task: AzureFunctionApp@1
-            displayName: 'Azure App Service Deploy: website'
+            displayName: 'Azure App Service Deploy: function'
             inputs:
               azureSubscription: $(ServiceConnectionName)
-              appName: 'fnapp-gzzmowgey3iem'
+              appName: $(appName)
               appType: 'functionApp'
               package: '$(Pipeline.Workspace)/drop/$(buildConfiguration)/*.zip'
               deploymentMethod: 'zipDeploy' 
