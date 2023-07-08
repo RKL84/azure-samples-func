@@ -76,6 +76,7 @@ stages:
     )
   jobs:
   - job: DeployARM
+    displayName: Deploy ARM
     steps:
       
     - task: AzureCLI@2
@@ -100,6 +101,7 @@ stages:
 
   - deployment: Deploy
     dependsOn: DeployARM
+    displayName: Upload Code
     pool:
       vmImage: 'ubuntu-20.04'
     condition: succeeded()
