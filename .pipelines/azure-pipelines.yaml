@@ -75,28 +75,8 @@ stages:
       eq(variables['Build.SourceBranchName'], variables['releaseBranchName'])
     )
   jobs:
-  - job:
-    steps:
-    - task: AzureCLI@2
-      inputs:
-        azureSubscription: $(ServiceConnectionName)
-        scriptType: bash
-        scriptLocation: inlineScript
-        useGlobalConfig: false
-        inlineScript: |
-          az --version
-          az group create --name $(resourceGroupName) --location $(deploymentDefaultLocation)
-
-    - task: AzureResourceManagerTemplateDeployment@3
-      inputs:
-        connectedServiceName: $(ServiceConnectionName)
-        deploymentName: $(Build.BuildNumber)
-        location: $(deploymentDefaultLocation)
-        resourceGroupName: $(ResourceGroupName)
-        csmFile: deploy/main.bicep
-        csmParametersFile: deploy/parameters.dev.json
-        overrideParameters: -appName $(appName)
-
+  # - job:
+  #   steps:
   - deployment: Deploy
     pool:
       vmImage: 'ubuntu-20.04'
@@ -109,8 +89,30 @@ stages:
           steps:
           - download: current
             artifact: drop
+          - task: AzureCLI@2
+            inputs:
+              azureSubscription: $(ServiceConnectionName)
+              scriptType: bash
+              scriptLocation: inlineScript
+              useGlobalConfig: false
+              inlineScript: |
+                az --version
+                az group create --name $(resourceGroupName) --location $(deploymentDefaultLocation)
+
+          - task: AzureResourceManagerTemplateDeployment@3
+            condition: succeeded()
+            inputs:
+              connectedServiceName: $(ServiceConnectionName)
+              deploymentName: $(Build.BuildNumber)
+              location: $(deploymentDefaultLocation)
+              resourceGroupName: $(ResourceGroupName)
+              csmFile: deploy/main.bicep
+              csmParametersFile: deploy/parameters.dev.json
+              overrideParameters: -appName $(appName)
+
           - task: AzureFunctionApp@1
             displayName: 'Azure App Service Deploy: function'
+            condition: succeeded()
             inputs:
               azureSubscription: $(ServiceConnectionName)
               appName: $(appName)
