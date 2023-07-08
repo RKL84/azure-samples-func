@@ -1,4 +1,5 @@
-trigger: none
+trigger:
+- '*'
 
 variables:
 - group: Release
@@ -63,26 +64,25 @@ stages:
 - stage: 'Dev'
   displayName: 'Deploy to the dev environment'
   dependsOn: Build
-  condition: succeeded()
-  # condition: |
-  #   and
-  #   (
-  #     succeeded(),
-  #     eq(variables['Build.SourceBranchName'], variables['releaseBranchName'])
-  #   )
+  condition: |
+    and
+    (
+      succeeded(),
+      eq(variables['Build.SourceBranchName'], variables['releaseBranchName'])
+    )
   jobs:
   - job:
     steps:
-    # - task: AzureCLI@2
-    #   inputs:
-    #     azureSubscription: $(ServiceConnectionName)
-    #     scriptType: bash
-    #     scriptLocation: inlineScript
-    #     useGlobalConfig: false
-    #     inlineScript: |
-    #       az --version
-    #       az group create --name $(resourceGroupName) --location $(deploymentDefaultLocation)
-    #       az deployment group create --resource-group $(ResourceGroupName) --template-file deploy/main.bicep
+    - task: AzureCLI@2
+      inputs:
+        azureSubscription: $(ServiceConnectionName)
+        scriptType: bash
+        scriptLocation: inlineScript
+        useGlobalConfig: false
+        inlineScript: |
+          az --version
+          az group create --name $(resourceGroupName) --location $(deploymentDefaultLocation)
+          
     - task: AzureResourceManagerTemplateDeployment@3
       inputs:
         connectedServiceName: $(ServiceConnectionName)
