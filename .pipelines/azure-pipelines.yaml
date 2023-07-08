@@ -75,8 +75,9 @@ stages:
       eq(variables['Build.SourceBranchName'], variables['releaseBranchName'])
     )
   jobs:
-  - job:
+  - job: DeployARM
     steps:
+      
     - task: AzureCLI@2
       inputs:
         azureSubscription: $(ServiceConnectionName)
@@ -98,6 +99,7 @@ stages:
         overrideParameters: -appName $(appName)
 
   - deployment: Deploy
+    dependsOn: DeployARM
     pool:
       vmImage: 'ubuntu-20.04'
     condition: succeeded()
