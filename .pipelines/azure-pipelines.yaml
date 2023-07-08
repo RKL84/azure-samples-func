@@ -75,9 +75,32 @@ stages:
       eq(variables['Build.SourceBranchName'], variables['releaseBranchName'])
     )
   jobs:
+  - job:
+    steps:
+    - task: AzureCLI@2
+      inputs:
+        azureSubscription: $(ServiceConnectionName)
+        scriptType: bash
+        scriptLocation: inlineScript
+        useGlobalConfig: false
+        inlineScript: |
+          az --version
+          az group create --name $(resourceGroupName) --location $(deploymentDefaultLocation)
+
+    - task: AzureResourceManagerTemplateDeployment@3
+      inputs:
+        connectedServiceName: $(ServiceConnectionName)
+        deploymentName: $(Build.BuildNumber)
+        location: $(deploymentDefaultLocation)
+        resourceGroupName: $(ResourceGroupName)
+        csmFile: deploy/main.bicep
+        csmParametersFile: deploy/parameters.dev.json
+        overrideParameters: -appName $(appName)
+
   - deployment: Deploy
     pool:
       vmImage: 'ubuntu-20.04'
+    condition: succeeded()
     environment: dev
     variables:
     - group: Release
@@ -85,32 +108,10 @@ stages:
       runOnce:
         deploy:
           steps:
-          - task: AzureCLI@2
-            inputs:
-              azureSubscription: $(ServiceConnectionName)
-              scriptType: bash
-              scriptLocation: inlineScript
-              useGlobalConfig: false
-              inlineScript: |
-                az --version
-                az group create --name $(resourceGroupName) --location $(deploymentDefaultLocation)
-
-          - task: AzureResourceManagerTemplateDeployment@3
-            displayName: 'Deploy ARM template'
-            inputs:
-              connectedServiceName: $(ServiceConnectionName)
-              deploymentName: $(Build.BuildNumber)
-              location: $(deploymentDefaultLocation)
-              resourceGroupName: $(ResourceGroupName)
-              csmFile: deploy/main.bicep
-              csmParametersFile: deploy/parameters.dev.json
-              # overrideParameters: -appName $(appName)
-
           - download: current
             artifact: drop
-
           - task: AzureFunctionApp@1
-            displayName: 'Upload zip file'
+            displayName: 'Azure App Service Deploy: function'
             inputs:
               azureSubscription: $(ServiceConnectionName)
               appName: $(appName)
