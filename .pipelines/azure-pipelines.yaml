@@ -75,8 +75,6 @@ stages:
       eq(variables['Build.SourceBranchName'], variables['releaseBranchName'])
     )
   jobs:
-  # - job:
-  #   steps:
   - deployment: Deploy
     pool:
       vmImage: 'ubuntu-20.04'
@@ -101,7 +99,6 @@ stages:
 
           - task: AzureResourceManagerTemplateDeployment@3
             displayName: 'Deploy ARM template'
-            # condition: succeeded()
             inputs:
               connectedServiceName: $(ServiceConnectionName)
               deploymentName: $(Build.BuildNumber)
@@ -113,7 +110,6 @@ stages:
 
           - task: AzureFunctionApp@1
             displayName: 'Upload zip file'
-            condition: succeeded()
             inputs:
               azureSubscription: $(ServiceConnectionName)
               appName: $(appName)
