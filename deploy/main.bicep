@@ -31,6 +31,7 @@ param appInsightsLocation string = resourceGroup().location
 
 var appServicePlanName = '${appName}-plan'
 var storageAccountName = 'st${appName}${env}'
+var keyVaultName = 'kv-shared-${env}'
 var functionAppName = 'func-${appName}-${env}'
 var functionWorkerRuntime = runtime
 var applicationInsightsName = appName
@@ -68,6 +69,17 @@ module functionAppModule 'templates/FunctionApp.bicep' = {
     name: functionAppName
     location: location
     planId: appServicePlan.outputs.planId
+  }
+}
+
+module keyVaultModule 'templates/KeyVault.bicep' = {
+  name: 'kvdeploy-${buildNumber}'
+  params: {
+    name: keyVaultName
+    location: location
+    sku: 'standard'
+    funcTenantId: functionAppModule.outputs.tenantId
+    funcPrincipalId: functionAppModule.outputs.principalId
   }
 }
 

@@ -17,9 +17,9 @@ param funcPrincipalId string
 @description('Function App tenant id')
 param funcTenantId string
 
-@description('Key Vault Secret: Database Connection String')
-@secure()
-param databaseConnectionString string
+// @description('Key Vault Secret: Database Connection String')
+// @secure()
+// param databaseConnectionString string
 
 resource keyVault 'Microsoft.KeyVault/vaults@2021-10-01' = {
   name: name
@@ -34,7 +34,7 @@ resource keyVault 'Microsoft.KeyVault/vaults@2021-10-01' = {
     accessPolicies: [
       {
         objectId: funcPrincipalId
-        tenantId: funcTenantId
+        tenantId: subscription().tenantId
         permissions: {
           secrets: [
             'get'
@@ -45,14 +45,14 @@ resource keyVault 'Microsoft.KeyVault/vaults@2021-10-01' = {
   }
 }
 
-resource databaseConnectionStringSecret 'Microsoft.KeyVault/vaults/secrets@2021-10-01' = {
-  name: '${name}/databaseConnectionString'
-  properties: {
-    value: databaseConnectionString
-  }
-  dependsOn: [
-    keyVault
-  ]
-}
+// resource databaseConnectionStringSecret 'Microsoft.KeyVault/vaults/secrets@2021-10-01' = {
+//   name: '${name}/databaseConnectionString'
+//   properties: {
+//     value: databaseConnectionString
+//   }
+//   dependsOn: [
+//     keyVault
+//   ]
+// }
 
-output databaseConnectionStringSecretUri string = databaseConnectionStringSecret.properties.secretUri
+// output databaseConnectionStringSecretUri string = databaseConnectionStringSecret.properties.secretUri
