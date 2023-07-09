@@ -35,17 +35,14 @@ var functionAppName = 'func-${appName}-${env}'
 var functionWorkerRuntime = runtime
 var applicationInsightsName = appName
 
+var buildNumber = uniqueString(resourceGroup().id)
 
-resource storageAccount 'Microsoft.Storage/storageAccounts@2022-05-01' = {
-  name: storageAccountName
-  location: location
-  sku: {
-    name: storageAccountType
-  }
-  kind: 'Storage'
-  properties: {
-    supportsHttpsTrafficOnly: true
-    defaultToOAuthAuthentication: true
+module storageAccountModule 'templates/StorageAccount.bicep' = {
+  name: 'stvmdeploy-${buildNumber}'
+  params: {
+    name: storageAccountName
+    sku: storageAccountType
+    location: location
   }
 }
 
@@ -76,11 +73,11 @@ resource functionApp 'Microsoft.Web/sites@2021-03-01' = {
       appSettings: [
         {
           name: 'AzureWebJobsStorage'
-          value: 'DefaultEndpointsProtocol=https;AccountName=${storageAccountName};EndpointSuffix=${environment().suffixes.storage};AccountKey=${storageAccount.listKeys().keys[0].value}'
+          value: storageAccountModule.outputs.storageAccountConnectionString
         }
         {
           name: 'WEBSITE_CONTENTAZUREFILECONNECTIONSTRING'
-          value: 'DefaultEndpointsProtocol=https;AccountName=${storageAccountName};EndpointSuffix=${environment().suffixes.storage};AccountKey=${storageAccount.listKeys().keys[0].value}'
+          value: storageAccountModule.outputs.storageAccountConnectionString
         }
         {
           name: 'WEBSITE_CONTENTSHARE'

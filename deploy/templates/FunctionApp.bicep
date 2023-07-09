@@ -7,20 +7,18 @@ param location string
 @description('App Service Plan Id')
 param planId string
 
-var kind = 'functionapp'
-
 resource functionApp 'Microsoft.Web/sites@2021-03-01' = {
   name: name
   location: location
-  kind: kind
-  properties: {
-    serverFarmId: planId
-  }
+  kind: 'functionapp'
   identity: {
     type: 'SystemAssigned'
   }
+  properties: {
+    serverFarmId: planId
+    httpsOnly: true
+  }
 }
-
 
 output functionAppName string = functionApp.name
 output principalId string = functionApp.identity.principalId
