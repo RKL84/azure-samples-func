@@ -21,8 +21,8 @@ param storageAccountType string = 'Standard_LRS'
 param runtime string = 'dotnet'
 param env string
 
-// @description('Location for Application Insights')
-// param appInsightsLocation string
+@description('Location for Application Insights')
+param appInsightsLocation string
 
 // @description('A unique suffix to add to resource names that need to be globally unique.')
 // @maxLength(13)
@@ -94,10 +94,10 @@ resource functionApp 'Microsoft.Web/sites@2021-03-01' = {
           name: 'WEBSITE_NODE_DEFAULT_VERSION'
           value: '~14'
         }
-        // {
-        //   name: 'APPINSIGHTS_INSTRUMENTATIONKEY'
-        //   value: applicationInsights.properties.InstrumentationKey
-        // }
+        {
+          name: 'APPINSIGHTS_INSTRUMENTATIONKEY'
+          value: applicationInsights.properties.InstrumentationKey
+        }
         {
           name: 'FUNCTIONS_WORKER_RUNTIME'
           value: functionWorkerRuntime
@@ -106,5 +106,24 @@ resource functionApp 'Microsoft.Web/sites@2021-03-01' = {
       ftpsState: 'FtpsOnly'
       minTlsVersion: '1.2'
     }
+  }
+}
+
+// resource applicationInsights 'Microsoft.Insights/components@2020-02-02' = {
+//   name: applicationInsightsName
+//   location: appInsightsLocation
+//   kind: 'web'
+//   properties: {
+//     Application_Type: 'web'
+//     Request_Source: 'rest'
+//   }
+// }
+
+//----------- Application Insights Deployment ------------
+module applicationInsightsModule 'templates/ApplicationInsights.bicep' = {
+  name: applicationInsightsName
+  params: {
+    name: applicationInsightsName
+    location: location
   }
 }
