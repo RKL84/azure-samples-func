@@ -38,7 +38,7 @@ var applicationInsightsName = appName
 
 var buildNumber = uniqueString(resourceGroup().id)
 
-module storageAccount 'templates/StorageAccount.bicep' = {
+module storageAccount 'br:acr10072023.azurecr.io/storage-account:1.2.20230709.1' = {
   name: 'stvmdeploy-${buildNumber}'
   params: {
     name: storageAccountName
@@ -47,7 +47,7 @@ module storageAccount 'templates/StorageAccount.bicep' = {
   }
 }
 
-module applicationInsightsModule 'templates/ApplicationInsights.bicep' = {
+module applicationInsightsModule 'br:acr10072023.azurecr.io/application-insights:1.2.20230709.4' = {
   name: 'appinsightdeploy-${buildNumber}'
   params: {
     name: applicationInsightsName
@@ -55,7 +55,7 @@ module applicationInsightsModule 'templates/ApplicationInsights.bicep' = {
   }
 }
 
-module appServicePlan 'templates/AppServicePlan.bicep'= {
+module appServicePlan 'br:acr10072023.azurecr.io/appservice-plan:1.2.20230709.1'= {
   name: 'plandeploy-${buildNumber}'
   params: {
     name: appServicePlanName
@@ -63,7 +63,7 @@ module appServicePlan 'templates/AppServicePlan.bicep'= {
   }
 }
 
-module functionAppModule 'templates/FunctionApp.bicep' = {
+module functionAppModule 'br:acr10072023.azurecr.io/function-app:1.2.20230709.1' = {
   name: 'funcdeploy-${buildNumber}'
   params: {
     name: functionAppName
@@ -72,7 +72,7 @@ module functionAppModule 'templates/FunctionApp.bicep' = {
   }
 }
 
-module keyVaultModule 'templates/KeyVault.bicep' = {
+module keyVaultModule 'br:acr10072023.azurecr.io/key-vault:1.2.20230709.1' = {
   name: 'kvdeploy-${buildNumber}'
   params: {
     name: keyVaultName
