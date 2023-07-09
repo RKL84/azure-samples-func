@@ -120,7 +120,7 @@ resource functionApp 'Microsoft.Web/sites@2021-03-01' = {
 // }
 
 //----------- Application Insights Deployment ------------
-module applicationInsightsModule './templates/ApplicationInsights.bicep' = {
+module applicationInsightsModule 'templates/ApplicationInsights.bicep' = {
   name: applicationInsightsName
   params: {
     name: applicationInsightsName
