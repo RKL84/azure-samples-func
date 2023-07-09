@@ -31,7 +31,7 @@ param resourceNameSuffix string = uniqueString(resourceGroup().id)
 
 var appServicePlanName = '${appName}-plan'
 var storageAccountName = 'st${appName}${env}'
-var keyVaultName = 'kv-shared-${env}-${resourceNameSuffix}'
+var keyVaultName = take('kv-shared-${env}-${resourceNameSuffix}',24)
 var functionAppName = 'func-${appName}-${env}'
 var functionWorkerRuntime = runtime
 var applicationInsightsName = appName
