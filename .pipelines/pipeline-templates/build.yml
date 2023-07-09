@@ -1,6 +1,6 @@
   jobs: 
-  - job: 'Build'
-    displayName: 'Build job'
+  - job: 'dotnet_build'
+    displayName: 'Build API Code'
     # pool:
     #   vmImage: 'ubuntu-20.04'
     #   demands:
@@ -39,3 +39,29 @@
   
     - publish: '$(Build.ArtifactStagingDirectory)'
       artifact: drop
+
+  - job: 'infra_build'
+    steps:
+
+      - task: AzureCLI@2
+        name: BuildBicepModule
+        displayName: Build Bicep
+        inputs:
+          azureSubscription: $(ServiceConnectionName)
+          scriptType: 'bash'
+          scriptLocation: 'inlineScript'
+          inlineScript: |
+            az bicep restore --file deploy/main.bicep
+            az bicep build --file deploy/main.bicep
+
+      - task: AzureResourceManagerTemplateDeployment@3
+        name: RunPreflightValidation
+        displayName: Run preflight validation
+        inputs:
+          connectedServiceName: $(ServiceConnectionName)
+          location: $(deploymentDefaultLocation)
+          deploymentMode: Validation
+          resourceGroupName: $(ResourceGroupName)
+          csmFile: deploy/main.bicep
+          csmParametersFile: deploy/parameters.dev.json
+          overrideParameters: -appName $(appName)

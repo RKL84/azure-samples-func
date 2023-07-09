@@ -26,12 +26,6 @@ stages:
   jobs: 
   - template: pipeline-templates/build.yml
 
-- stage: 'Validate'
-  displayName: 'Validate ARM templates'
-  dependsOn: Build
-  jobs: 
-  - template: pipeline-templates/validate.yml
-
 - stage: 'Dev'
   displayName: 'Deploy to the dev environment'
   dependsOn: Validate
