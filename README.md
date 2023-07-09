@@ -1,6 +1,7 @@
 # Reference 
 https://learn.microsoft.com/en-us/training/modules/build-first-bicep-deployment-pipeline-using-azure-pipelines/
 https://learn.microsoft.com/en-us/azure/azure-functions/functions-create-first-function-bicep?tabs=CLI
+https://github.com/azure-samples/azure-sql-binding-func-dotnet-todo/tree/main/
 
 ## 1 Prerequisites 
 
