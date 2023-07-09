@@ -29,24 +29,7 @@ stages:
 - stage: 'Validate'
   displayName: 'Validate ARM templates'
   jobs: 
-  - job: Validate
-    steps:
-      - script: |
-          az bicep build --file deploy/main.bicep
-        name: LintBicepCode
-        displayName: Run Bicep linter
-
-      - task: AzureResourceManagerTemplateDeployment@3
-        name: RunPreflightValidation
-        displayName: Run preflight validation
-        inputs:
-          connectedServiceName: $(ServiceConnectionName)
-          location: $(deploymentDefaultLocation)
-          deploymentMode: Validation
-          resourceGroupName: $(ResourceGroupName)
-          csmFile: deploy/main.bicep
-          csmParametersFile: deploy/parameters.dev.json
-          overrideParameters: -appName $(appName)
+    - template: pipeline-templates/validate.yml
 
 - stage: 'Dev'
   displayName: 'Deploy to the dev environment'
