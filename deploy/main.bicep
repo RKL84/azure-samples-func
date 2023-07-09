@@ -46,16 +46,11 @@ module storageAccountModule 'templates/StorageAccount.bicep' = {
   }
 }
 
-resource appServicePlan 'Microsoft.Web/serverfarms@2022-03-01' = {
-  name: appServicePlanName
-  location: location
-  // sku: {
-  //   name: 'F1'
-  //   capacity: 1
-  // }
-  sku: {
-    name: 'Y1'
-    tier: 'Dynamic'
+module appServiceModule 'templates/AppServicePlan.bicep'= {
+  name: 'stvmdeploy-${buildNumber}'
+  params: {
+    name: appServicePlanName
+    location: location
   }
 }
 
@@ -67,7 +62,7 @@ resource functionApp 'Microsoft.Web/sites@2021-03-01' = {
     type: 'SystemAssigned'
   }
   properties: {
-    serverFarmId: appServicePlan.id
+    serverFarmId: appServiceModule.outputs.planId
     httpsOnly: true
     siteConfig: {
       appSettings: [
