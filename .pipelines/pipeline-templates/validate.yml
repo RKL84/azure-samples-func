@@ -2,8 +2,9 @@
   - job: Validate
     steps:
       - script: |
+          az bicep restore --file deploy/main.bicep
           az bicep build --file deploy/main.bicep
-        name: LintBicepCode
+        name: BuildBicepModule
         displayName: Run Bicep linter
 
       - task: AzureResourceManagerTemplateDeployment@3
