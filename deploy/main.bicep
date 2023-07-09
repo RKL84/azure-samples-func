@@ -37,7 +37,7 @@ var applicationInsightsName = appName
 
 var buildNumber = uniqueString(resourceGroup().id)
 
-module storageAccountModule 'templates/StorageAccount.bicep' = {
+module storageAccount 'templates/StorageAccount.bicep' = {
   name: 'stvmdeploy-${buildNumber}'
   params: {
     name: storageAccountName
@@ -46,76 +46,38 @@ module storageAccountModule 'templates/StorageAccount.bicep' = {
   }
 }
 
-module appServiceModule 'templates/AppServicePlan.bicep'= {
-  name: 'stvmdeploy-${buildNumber}'
+module applicationInsightsModule 'templates/ApplicationInsights.bicep' = {
+  name: 'appinsightdeploy-${buildNumber}'
+  params: {
+    name: applicationInsightsName
+    location: appInsightsLocation
+  }
+}
+
+module appServicePlan 'templates/AppServicePlan.bicep'= {
+  name: 'plandeploy-${buildNumber}'
   params: {
     name: appServicePlanName
     location: location
   }
 }
 
-resource functionApp 'Microsoft.Web/sites@2021-03-01' = {
-  name: functionAppName
-  location: location
-  kind: 'functionapp'
-  identity: {
-    type: 'SystemAssigned'
-  }
-  properties: {
-    serverFarmId: appServiceModule.outputs.planId
-    httpsOnly: true
-    siteConfig: {
-      appSettings: [
-        {
-          name: 'AzureWebJobsStorage'
-          value: storageAccountModule.outputs.storageAccountConnectionString
-        }
-        {
-          name: 'WEBSITE_CONTENTAZUREFILECONNECTIONSTRING'
-          value: storageAccountModule.outputs.storageAccountConnectionString
-        }
-        {
-          name: 'WEBSITE_CONTENTSHARE'
-          value: toLower(functionAppName)
-        }
-        {
-          name: 'FUNCTIONS_EXTENSION_VERSION'
-          value: '~4'
-        }
-        {
-          name: 'WEBSITE_NODE_DEFAULT_VERSION'
-          value: '~14'
-        }
-        // {
-        //   name: 'APPINSIGHTS_INSTRUMENTATIONKEY'
-        //   value: applicationInsights.properties.InstrumentationKey
-        // }
-        {
-          name: 'FUNCTIONS_WORKER_RUNTIME'
-          value: functionWorkerRuntime
-        }
-      ]
-      ftpsState: 'FtpsOnly'
-      minTlsVersion: '1.2'
-    }
+module functionAppModule 'templates/FunctionApp.bicep' = {
+  name: 'funcdeploy-${buildNumber}'
+  params: {
+    name: functionAppName
+    location: location
+    planId: appServicePlan.outputs.planId
   }
 }
 
-// resource applicationInsights 'Microsoft.Insights/components@2020-02-02' = {
-//   name: applicationInsightsName
-//   location: appInsightsLocation
-//   kind: 'web'
-//   properties: {
-//     Application_Type: 'web'
-//     Request_Source: 'rest'
-//   }
-// }
-
-//----------- Application Insights Deployment ------------
-module applicationInsightsModule 'templates/ApplicationInsights.bicep' = {
-  name: applicationInsightsName
+module functionAppSettingsModule 'templates/FunctionAppSettings.bicep' = {
+  name: 'siteconf-${buildNumber}'
   params: {
-    name: applicationInsightsName
-    location: appInsightsLocation
+    applicationInsightsKey: applicationInsightsModule.outputs.applicationInsightsKey
+    // databaseConnectionString: keyVaultModule.outputs.databaseConnectionStringSecretUri
+    functionAppName: functionAppModule.outputs.functionAppName
+    functionAppRuntime: functionWorkerRuntime
+    storageAccountConnectionString: storageAccount.outputs.storageAccountConnectionString
   }
 }

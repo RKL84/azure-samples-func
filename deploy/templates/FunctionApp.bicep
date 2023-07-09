@@ -17,7 +17,11 @@ resource functionApp 'Microsoft.Web/sites@2021-03-01' = {
   properties: {
     serverFarmId: planId
     httpsOnly: true
-  }
+    siteConfig: {
+      ftpsState: 'FtpsOnly'
+      minTlsVersion: '1.2'
+    }
+  }       
 }
 
 output functionAppName string = functionApp.name
