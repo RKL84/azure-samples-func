@@ -80,6 +80,7 @@ stages:
     steps:
       
     - task: AzureCLI@2
+      displayName: Create Resource Group
       inputs:
         azureSubscription: $(ServiceConnectionName)
         scriptType: bash
@@ -90,6 +91,7 @@ stages:
           az group create --name $(resourceGroupName) --location $(deploymentDefaultLocation)
 
     - task: AzureResourceManagerTemplateDeployment@3
+      displayName: Deploy ARM Template
       inputs:
         connectedServiceName: $(ServiceConnectionName)
         deploymentName: $(Build.BuildNumber)
