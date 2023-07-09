@@ -29,7 +29,7 @@ stages:
 - stage: 'Validate'
   displayName: 'Validate ARM templates'
   jobs: 
-    - template: pipeline-templates/validate.yml
+  - template: pipeline-templates/validate.yml
 
 - stage: 'Dev'
   displayName: 'Deploy to the dev environment'
