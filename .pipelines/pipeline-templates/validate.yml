@@ -1,11 +1,17 @@
   jobs:
   - job: Validate
     steps:
-      - script: |
-          az bicep restore --file deploy/main.bicep
-          az bicep build --file deploy/main.bicep
+
+      - task: AzureCLI@2
         name: BuildBicepModule
-        displayName: Run Bicep linter
+        displayName: Build Bicep
+        inputs:
+          azureSubscription: $(ServiceConnectionName)
+          scriptType: 'bash'
+          scriptLocation: 'inlineScript'
+          inlineScript: |
+            az bicep restore --file deploy/main.bicep
+            az bicep build --file deploy/main.bicep
 
       - task: AzureResourceManagerTemplateDeployment@3
         name: RunPreflightValidation
