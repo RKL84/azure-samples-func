@@ -62,6 +62,13 @@ stages:
         arguments: '--no-build --configuration $(buildConfiguration) --output $(Build.ArtifactStagingDirectory)/$(buildConfiguration)'
         zipAfterPublish: true
 
+  - job: Lint
+    steps:
+      - script: |
+          az bicep build --file deploy/main.bicep
+
+  - job: Publish
+    steps:
     - publish: '$(Build.ArtifactStagingDirectory)'
       artifact: drop
 
