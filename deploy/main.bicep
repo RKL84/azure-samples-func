@@ -47,7 +47,7 @@ module storageAccount 'br:acr10072023.azurecr.io/storage-account:1.2.20230709.1'
   }
 }
 
-module applicationInsightsModule 'br:acr10072023.azurecr.io/application-insights:1.2.20230709.4' = {
+module applicationInsights 'br:acr10072023.azurecr.io/application-insights:1.2.20230709.4' = {
   name: 'appinsightdeploy-${buildNumber}'
   params: {
     name: applicationInsightsName
@@ -86,7 +86,7 @@ module keyVaultModule 'br:acr10072023.azurecr.io/key-vault:1.2.20230709.1' = {
 module functionAppSettingsModule 'templates/FunctionAppSettings.bicep' = {
   name: 'siteconf-${buildNumber}'
   params: {
-    applicationInsightsKey: applicationInsightsModule.outputs.applicationInsightsKey
+    applicationInsightsKey: applicationInsights.outputs.applicationInsightsKey
     // databaseConnectionString: keyVaultModule.outputs.databaseConnectionStringSecretUri
     functionAppName: functionAppModule.outputs.functionAppName
     functionAppRuntime: functionWorkerRuntime
