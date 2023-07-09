@@ -1,28 +1,41 @@
-jobs:
-- job: Build
-  displayName: Build application and database
-  pool:
-    vmImage: windows-latest
+  jobs: 
+  - job: 'Build'
+    displayName: 'Build job'
+    # pool:
+    #   vmImage: 'ubuntu-20.04'
+    #   demands:
+    #   - npm
 
-  steps:
+    variables:
+      dotnetSdkVersion: '6.x'
 
-  # Build, copy, and publish the website.
-  - task: DotNetCoreCLI@2
-    displayName: Build publishable website
-    inputs:
-      command: 'publish'
-      publishWebProjects: true
+    steps:
+    - task: UseDotNet@2
+      displayName: 'Use .NET SDK $(dotnetSdkVersion)'
+      inputs:
+        version: '$(dotnetSdkVersion)'
 
-  - task: CopyFiles@2
-    displayName: Copy publishable website
-    inputs:
-      sourceFolder: '$(Build.SourcesDirectory)/src/ToyCompany/ToyCompany.Website/bin'
-      contents: '**/publish.zip'
-      targetFolder: '$(Build.ArtifactStagingDirectory)/website'
-      flattenFolders: true
+    - task: DotNetCoreCLI@2
+      displayName: 'Restore project dependencies'
+      inputs:
+        command: 'restore'
+        projects: '**/*.csproj'
 
-  - task: PublishBuildArtifacts@1
-    displayName: Publish website as pipeline artifact
-    inputs:
-      pathToPublish: '$(Build.ArtifactStagingDirectory)/website'
-      artifactName: 'website'
+    - task: DotNetCoreCLI@2
+      displayName: 'Build the project - $(buildConfiguration)'
+      inputs:
+        command: 'build'
+        arguments: '--no-restore --configuration $(buildConfiguration)'
+        projects: '**/*.csproj'
+
+    - task: DotNetCoreCLI@2
+      displayName: 'Publish the project - $(buildConfiguration)'
+      inputs:
+        command: 'publish'
+        projects: '**/*.csproj'
+        publishWebProjects: false
+        arguments: '--no-build --configuration $(buildConfiguration) --output $(Build.ArtifactStagingDirectory)/$(buildConfiguration)'
+        zipAfterPublish: true
+  
+    - publish: '$(Build.ArtifactStagingDirectory)'
+      artifact: drop
