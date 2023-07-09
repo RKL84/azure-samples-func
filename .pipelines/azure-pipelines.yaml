@@ -61,6 +61,9 @@ stages:
         publishWebProjects: false
         arguments: '--no-build --configuration $(buildConfiguration) --output $(Build.ArtifactStagingDirectory)/$(buildConfiguration)'
         zipAfterPublish: true
+  
+    - publish: '$(Build.ArtifactStagingDirectory)'
+      artifact: drop
 
   - job: Validate
     steps:
@@ -80,11 +83,6 @@ stages:
           csmFile: deploy/main.bicep
           csmParametersFile: deploy/parameters.dev.json
           overrideParameters: -appName $(appName)
-
-  - job: Publish
-    steps:
-    - publish: '$(Build.ArtifactStagingDirectory)'
-      artifact: drop
 
 - stage: 'Dev'
   displayName: 'Deploy to the dev environment'
