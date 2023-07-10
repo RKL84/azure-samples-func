@@ -28,7 +28,7 @@ stages:
 
 - stage: 'Dev'
   displayName: 'Deploy to the dev environment'
-  dependsOn: Validate
+  dependsOn: Build
   condition: |
     and
     (
