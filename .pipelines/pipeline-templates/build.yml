@@ -1,3 +1,9 @@
+  parameters:
+  - name: bicepsTemplatePath
+    type: string
+  - name: bicepsTemplateParameterPath
+    type: string
+
   jobs: 
   - job: 'dotnet_build'
     displayName: 'Build API Code'
@@ -41,6 +47,7 @@
       artifact: drop
 
   - job: 'infra_build'
+    displayName: 'Build Infra Code'
     steps:
 
       - task: AzureCLI@2
@@ -51,8 +58,8 @@
           scriptType: 'bash'
           scriptLocation: 'inlineScript'
           inlineScript: |
-            az bicep restore --file deploy/main.bicep
-            az bicep build --file deploy/main.bicep
+            az bicep restore --file $(bicepsTemplatePath)
+            az bicep build --file $(bicepsTemplatePath) --outfile $(Build.SourcesDirectory)/main.json
 
       - task: AzureResourceManagerTemplateDeployment@3
         name: RunPreflightValidation
@@ -62,6 +69,6 @@
           location: $(deploymentDefaultLocation)
           deploymentMode: Validation
           resourceGroupName: $(ResourceGroupName)
-          csmFile: deploy/main.bicep
-          csmParametersFile: deploy/parameters.dev.json
+          csmFile: $(bicepsTemplatePath)
+          csmParametersFile: $(bicepsTemplateParameterPath)
           overrideParameters: -appName $(appName)

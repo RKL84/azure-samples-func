@@ -25,6 +25,9 @@ stages:
   displayName: 'Build the web application'
   jobs: 
   - template: pipeline-templates/build.yml
+    parameters:
+      bicepsTemplatePath: deploy/main.bicep
+      bicepsTemplateParameterPath: deploy/parameters.dev.json
 
 - stage: 'Dev'
   displayName: 'Deploy to the dev environment'
