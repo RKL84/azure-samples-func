@@ -43,6 +43,7 @@
       runOnce:
         deploy:
           steps:
+          - checkout: self
           - download: current
             displayName: Download template
           - task: AzurePowerShell@5
