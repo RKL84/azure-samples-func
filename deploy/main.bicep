@@ -31,6 +31,7 @@ var buildNumber = uniqueString(resourceGroup().id)
 
 resource storageAccount 'Microsoft.Storage/storageAccounts@2021-06-01' existing = {
   name: storageAccountName
+  scope: resourceGroup('azure-shared-rg')
 }
 
 module applicationInsights 'br:acr10072023.azurecr.io/application-insights:1.2.20230709.4' = {
