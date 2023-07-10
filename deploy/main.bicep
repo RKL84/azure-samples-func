@@ -12,6 +12,7 @@ param location string = resourceGroup().location
 ])
 param runtime string = 'dotnet'
 param env string
+param keyVaultName string
 param storageAccountName string
 param sharedResourceGroupName string
 
@@ -34,6 +35,12 @@ resource storageAccount 'Microsoft.Storage/storageAccounts@2021-06-01' existing 
   name: storageAccountName
   scope: resourceGroup(sharedResourceGroupName)
 }
+
+resource keyVault 'Microsoft.KeyVault/vaults@2023-02-01' existing =  {
+   name: keyVaultName
+   scope: resourceGroup(sharedResourceGroupName)
+}
+
 
 module applicationInsights 'br:acr10072023.azurecr.io/application-insights:1.2.20230709.4' = {
   name: 'appinsightdeploy-${buildNumber}'
@@ -69,5 +76,15 @@ module functionAppSettingsModule 'templates/FunctionAppSettings.bicep' = {
     functionAppName: functionAppModule.outputs.functionAppName
     functionAppRuntime: functionWorkerRuntime
     storageAccountConnectionString: storageAccountConnectionString
+  }
+}
+
+module storageAccount_roleAssignments 'storage-account-role-assignment.bicep' = {
+  name: 'data-facory-storage-account-role-assignment'
+  scope: resourceGroup()
+  params:{
+    storageAccountName: storageAccountName
+    roleId: 'Storage Account Contributor'
+    principalId: functionAppModule.outputs.principalId
   }
 }
