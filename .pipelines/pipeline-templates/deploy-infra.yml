@@ -20,6 +20,8 @@
         deploy:
           steps:
           - download: current
+            displayName: Download template
+            artifact: Bicep
           - task: AzureResourceManagerTemplateDeployment@3
             displayName: Deploy ARM Template
             inputs:
@@ -27,6 +29,6 @@
               deploymentName: $(Build.BuildNumber)
               location: $(deploymentDefaultLocation)
               resourceGroupName: $(ResourceGroupName)
-              csmFile: ${{ parameters.templateFilePath }}
+              csmFile: $(Pipeline.Workspace)/Bicep/main.json
               csmParametersFile: ${{ parameters.templateParameterFilePath }}
               overrideParameters: -appName $(appName)
