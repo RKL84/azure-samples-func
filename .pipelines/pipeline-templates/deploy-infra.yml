@@ -1,11 +1,14 @@
   parameters:
   - name: templateFilePath
     type: string
-  - name: templateParameterFilePath
+  - name: templateFilePath
+    type: string
+  - name: appName
     type: string
   
   jobs:
   - job: DeployARM
+    dependsOn: CreateResourceGroup
     displayName: Deploy ARM template
     steps:
     - task: AzureResourceManagerTemplateDeployment@3

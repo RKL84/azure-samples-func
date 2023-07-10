@@ -57,6 +57,7 @@ stages:
 
     - template: pipeline-templates/deploy-infra.yml
       parameters:
+        appName: func-$(appName)-dev
         templateFilePath: $(Pipeline.Workspace)/Bicep/main.json
         templateParameterFilePath: $(Build.SourcesDirectory)/deploy/parameters.dev.json
     
