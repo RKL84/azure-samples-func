@@ -55,7 +55,7 @@
         displayName: Build Bicep
         inputs:
           azureSubscription: $(ServiceConnectionName)
-          scriptType: 'bash'
+          scriptType: 'pscore'
           scriptLocation: 'inlineScript'
           inlineScript: |
             az bicep restore --file $(bicepTemplatePath)
