@@ -5,8 +5,8 @@
     type: string
 
   jobs:
-  - deployment: DeployFunctionApp
-    displayName: Deploy Function App
+  - deployment: UploadFunctionAppCode
+    displayName: Upload Function App Code
     pool:
       vmImage: 'ubuntu-20.04'
     condition: succeeded()
