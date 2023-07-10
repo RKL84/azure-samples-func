@@ -2,12 +2,18 @@ param(
  $ResourceGroupName,
  $Location,
  $TemplateFile,
- $TemplateParameterFile
+ $TemplateParametersFile
 )
 
-
-$resourceGroup = Get-AzResourceGroup -Name $ResourceGroupName -ErrorAction SilentlyContinue
-if(-Not $resourceGroup){
-
-# $updateDate = get-Date -Format "yyyy-MM-dd HH:mm:ss K"
+# $resourceGroup = Get-AzResourceGroup -Name $ResourceGroupName -ErrorAction SilentlyContinue
+# if(-Not $resourceGroup){
 # }
+
+$DeploymentName  =(([io.path]::GetFileNameWithoutExtension($TemplateFile)) + '-' + ((Get-Date).ToUniversalTime()).ToString('MMdd-HHmm'))
+
+New-AzureRmResourceGroupDeployment `
+  -Name $DeploymentName `
+  -ResourceGroupName $ResourceGroupName `
+  -TemplateFile $TemplateFile
+  -TemplateParametersFile $TemplateParametersFile
+ 
