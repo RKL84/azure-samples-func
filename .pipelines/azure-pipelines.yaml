@@ -28,7 +28,7 @@ stages:
       - template: pipeline-templates/build-infra.yml
         parameters:
           bicepTemplateFilePath: $(Build.SourcesDirectory)/deploy/main.bicep
-          bicepTemplateFileParameterPath: $(Build.SourcesDirectory)/deploy/parameters.dev.json
+          templateParameterFilePath: $(Build.SourcesDirectory)/deploy/parameters.dev.json
 
 
   - stage: 'Dev'
@@ -58,5 +58,5 @@ stages:
 
     - template: pipeline-templates/deploy-infra.yml
       parameters:
-        bicepTemplateFilePath: $(Pipeline.Workspace)/Bicep/main.json
-        bicepTemplateFileParameterPath: $(Build.SourcesDirectory)/deploy/parameters.dev.json
+        templateFilePath: $(Pipeline.Workspace)/Bicep/main.json
+        templateParameterFilePath: $(Build.SourcesDirectory)/deploy/parameters.dev.json

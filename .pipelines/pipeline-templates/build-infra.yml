@@ -1,7 +1,7 @@
   parameters:
   - name: bicepTemplateFilePath
     type: string
-  - name: bicepTemplateFileParameterPath
+  - name: templateParameterFilePath
     type: string
 
   jobs: 
@@ -32,5 +32,5 @@
           deploymentMode: Validation
           resourceGroupName: $(ResourceGroupName)
           csmFile: ${{ parameters.bicepTemplateFilePath}}
-          csmParametersFile: ${{ parameters.bicepTemplateFileParameterPath}}
+          csmParametersFile: ${{ parameters.templateParameterFilePath}}
           overrideParameters: -appName $(appName)
