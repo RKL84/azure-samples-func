@@ -1,3 +1,9 @@
+  parameters:
+  - name: appName
+    type: string
+  - name: package
+    type: string
+
   jobs:
   - deployment: Deploy Function App
     displayName: Deploy Function App
@@ -17,7 +23,7 @@
             displayName: 'Azure App Service Deploy: function'
             inputs:
               azureSubscription: $(ServiceConnectionName)
-              appName: func-$(appName)-dev
+              appName: ${{ parameters.appName}}
               appType: 'functionApp'
-              package: '$(Pipeline.Workspace)/FunctionApp/$(buildConfiguration)/*.zip'
+              package: '${{ parameters.package}}'
               deploymentMethod: 'zipDeploy' 

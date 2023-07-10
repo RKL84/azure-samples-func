@@ -30,7 +30,6 @@ stages:
           bicepTemplateFilePath: $(Build.SourcesDirectory)/deploy/main.bicep
           templateParameterFilePath: $(Build.SourcesDirectory)/deploy/parameters.dev.json
 
-
   - stage: 'Dev'
     displayName: 'Deploy to the dev environment'
     dependsOn: Build
@@ -60,3 +59,8 @@ stages:
       parameters:
         templateFilePath: $(Pipeline.Workspace)/Bicep/main.json
         templateParameterFilePath: $(Build.SourcesDirectory)/deploy/parameters.dev.json
+    
+    - template: pipeline-templates/deploy-fapp.yml
+      parameters:
+        appName: func-$(appName)-dev
+        package: '$(Pipeline.Workspace)/FunctionApp/$(buildConfiguration)/*.zip'
