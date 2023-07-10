@@ -1,5 +1,3 @@
-  parameters:
-
   jobs: 
   - job: 'dotnet_build'
     displayName: 'Build API Code'
