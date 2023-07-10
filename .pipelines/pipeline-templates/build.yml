@@ -1,9 +1,12 @@
-  parameters:
-  - name: bicepTemplatePath
-    type: string
-  - name: bicepTemplateParameterPath
-    type: string
+parameters:
+- name: bicepTemplatePath
+  type: string
+- name: bicepTemplateParameterPath
+  type: string
 
+stages:
+- stage: 'Build'
+  displayName: 'Build the web application'
   jobs: 
   - job: 'dotnet_build'
     displayName: 'Build API Code'
