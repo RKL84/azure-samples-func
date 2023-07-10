@@ -15,6 +15,6 @@
         deploymentName: $(Build.BuildNumber)
         location: $(deploymentDefaultLocation)
         resourceGroupName: $(ResourceGroupName)
-        csmFile: ${{ templateFilePath }}
-        csmParametersFile: ${{ templateParameterFilePath }}}
+        csmFile: ${{ parameters.templateFilePath }}
+        csmParametersFile: ${{ parameters.templateParameterFilePath }}}
         overrideParameters: -appName $(appName)
