@@ -55,10 +55,10 @@ stages:
             az --version
             az group create --name $(resourceGroupName) --location $(deploymentDefaultLocation)
 
-    # - template: pipeline-templates/deploy-infra.yml
-    #   parameters:
-    #     templateFilePath: '$(Pipeline.Workspace)/Bicep/main.json'
-    #     templateParameterFilePath: $(Build.SourcesDirectory)/deploy/parameters.dev.json
+    - template: pipeline-templates/deploy-infra.yml
+      parameters:
+        templateFilePath: '$(Pipeline.Workspace)/Bicep/main.json'
+        templateParameterFilePath: $(Build.SourcesDirectory)/deploy/parameters.dev.json
     
     - template: pipeline-templates/deploy-fapp.yml
       parameters:
