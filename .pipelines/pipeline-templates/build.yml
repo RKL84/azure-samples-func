@@ -44,7 +44,7 @@
         zipAfterPublish: true
   
     - publish: '$(Build.ArtifactStagingDirectory)'
-      artifact: drop
+      artifact: FunctionApp
 
   - job: 'infra_build'
     displayName: 'Build Infra Code'
@@ -60,6 +60,9 @@
           inlineScript: |
             az bicep restore --file $(bicepsTemplatePath)
             az bicep build --file $(bicepsTemplatePath) --outfile $(Build.SourcesDirectory)/main.json
+
+      - publish: $(Build.SourcesDirectory)/main.json
+        artifact: Bicep
 
       - task: AzureResourceManagerTemplateDeployment@3
         name: RunPreflightValidation
