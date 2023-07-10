@@ -62,7 +62,7 @@ stages:
           scriptLocation: 'inlineScript'
           inlineScript: |
             az bicep restore --file deploy/main.bicep
-            az bicep build --file deploy/parameters.dev.json --outfile $(Build.SourcesDirectory)/main.json
+            az bicep build --file deploy/main.bicep --outfile $(Build.SourcesDirectory)/main.json
 
       - publish: $(Build.SourcesDirectory)/main.json
         artifact: Bicep
