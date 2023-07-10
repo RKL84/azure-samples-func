@@ -75,6 +75,6 @@ stages:
           location: $(deploymentDefaultLocation)
           deploymentMode: Validation
           resourceGroupName: $(ResourceGroupName)
-          csmFile: $(bicepTemplatePath)
-          csmParametersFile: $(bicepTemplateParameterPath)
+          csmFile: ${{ parameters.bicepTemplatePath}}
+          csmParametersFile: ${{ parameters.bicepTemplateParameterPath}}
           overrideParameters: -appName $(appName)
