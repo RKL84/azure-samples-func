@@ -20,7 +20,7 @@
             az bicep restore --file ${{ parameters.bicepTemplateFilePath}}
             az bicep build --file ${{ parameters.bicepTemplateFilePath}} --outfile $(Build.SourcesDirectory)/main.json
 
-      - publish: $(Build.SourcesDirectory)/main.json
+      - publish: '$(Build.ArtifactStagingDirectory)/main.json'
         artifact: Bicep
 
       - task: AzureResourceManagerTemplateDeployment@3
