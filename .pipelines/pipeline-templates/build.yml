@@ -58,6 +58,7 @@
           scriptType: 'pscore'
           scriptLocation: 'inlineScript'
           inlineScript: |
+            echo $(bicepTemplatePath)
             az bicep restore --file $(bicepTemplatePath)
             az bicep build --file $(bicepTemplatePath) --outfile $(Build.SourcesDirectory)/main.json
 
