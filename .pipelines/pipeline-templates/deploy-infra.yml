@@ -1,0 +1,20 @@
+  parameters:
+  - name: templateFilePath
+    type: string
+  - name: templateParameterFilePath
+    type: string
+  
+  jobs:
+  - job: DeployARM
+    displayName: Deploy ARM template
+    steps:
+    - task: AzureResourceManagerTemplateDeployment@3
+      displayName: Deploy ARM Template
+      inputs:
+        connectedServiceName: $(ServiceConnectionName)
+        deploymentName: $(Build.BuildNumber)
+        location: $(deploymentDefaultLocation)
+        resourceGroupName: $(ResourceGroupName)
+        csmFile: ${{ templateFilePath }}}
+        csmParametersFile: ${{ templateParameterFilePath }}}
+        overrideParameters: -appName $(appName)

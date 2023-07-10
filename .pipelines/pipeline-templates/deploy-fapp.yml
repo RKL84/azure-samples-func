@@ -1,0 +1,23 @@
+  jobs:
+  - deployment: Deploy Function App
+    displayName: Deploy Function App
+    pool:
+      vmImage: 'ubuntu-20.04'
+    condition: succeeded()
+    environment: dev
+    variables:
+    - group: Release
+    strategy:
+      runOnce:
+        deploy:
+          steps:
+          - download: current
+            artifact: FunctionApp
+          - task: AzureFunctionApp@1
+            displayName: 'Azure App Service Deploy: function'
+            inputs:
+              azureSubscription: $(ServiceConnectionName)
+              appName: func-$(appName)-dev
+              appType: 'functionApp'
+              package: '$(Pipeline.Workspace)/FunctionApp/$(buildConfiguration)/*.zip'
+              deploymentMethod: 'zipDeploy' 
