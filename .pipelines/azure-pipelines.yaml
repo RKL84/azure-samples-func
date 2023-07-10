@@ -57,7 +57,7 @@ stages:
 
     - template: pipeline-templates/deploy-infra.yml
       parameters:
-        templateFilePath: '$(Pipeline.Workspace)/Bicep/main.json'
+        templateFilePath: $(Pipeline.Workspace)/Bicep/main.json
         templateParameterFilePath: $(Build.SourcesDirectory)/deploy/parameters.dev.json
     
     - template: pipeline-templates/deploy-fapp.yml
