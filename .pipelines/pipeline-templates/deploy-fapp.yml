@@ -5,7 +5,7 @@
     type: string
 
   jobs:
-  - deployment: Deploy Function App
+  - deployment: DeployFunctionApp
     displayName: Deploy Function App
     pool:
       vmImage: 'ubuntu-20.04'
