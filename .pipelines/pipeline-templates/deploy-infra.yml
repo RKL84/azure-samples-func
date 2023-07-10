@@ -21,7 +21,6 @@
           steps:
           - download: current
             displayName: Download template
-            artifact: Bicep
           - task: AzureResourceManagerTemplateDeployment@3
             displayName: Deploy ARM Template
             inputs:
