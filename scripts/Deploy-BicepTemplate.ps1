@@ -14,6 +14,6 @@ $DeploymentName  =(([io.path]::GetFileNameWithoutExtension($TemplateFile)) + '-'
 New-AzResourceGroupDeployment `
   -Name $DeploymentName `
   -ResourceGroupName $ResourceGroupName `
-  -TemplateFile $TemplateFile
+  -TemplateFile $TemplateFile `
   -TemplateParameterFile $TemplateParameterFile
  
