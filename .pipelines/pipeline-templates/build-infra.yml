@@ -18,7 +18,7 @@
           scriptLocation: 'inlineScript'
           inlineScript: |
             az bicep restore --file ${{ parameters.bicepTemplateFilePath}}
-            az bicep build --file ${{ parameters.bicepTemplateFilePath}} --outfile $(Build.SourcesDirectory)/main.json
+            az bicep build --file ${{ parameters.bicepTemplateFilePath}} --outfile $(Build.ArtifactStagingDirectory)/main.json
 
       - publish: '$(Build.ArtifactStagingDirectory)/main.json'
         artifact: Bicep
