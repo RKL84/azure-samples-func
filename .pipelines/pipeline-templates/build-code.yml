@@ -1,6 +1,6 @@
   jobs: 
   - job: 'dotnet_build'
-    displayName: 'Build API Code'
+    displayName: 'Build Function App Code'
     # pool:
     #   vmImage: 'ubuntu-20.04'
     #   demands:

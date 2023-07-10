@@ -30,52 +30,36 @@ stages:
           bicepTemplatePath: $(Build.SourcesDirectory)/deploy/main.bicep
           bicepTemplateParameterPath: $(Build.SourcesDirectory)/deploy/parameters.dev.json
 
-# stages:
-#   - template: pipeline-templates/build.yml
-#     parameters:
-#       bicepTemplatePath: $(Build.SourcesDirectory)/deploy/main.bicep
-#       bicepTemplateParameterPath: $(Build.SourcesDirectory)/deploy/parameters.dev.json
 
-#   - template: pipeline-templates/build.yml
-#     parameters:
-#       bicepTemplatePath: $(Build.SourcesDirectory)/deploy/main.bicep
-#       bicepTemplateParameterPath: $(Build.SourcesDirectory)/deploy/parameters.dev.json
-
-#   # - stage: 'Dev'
-#   #   displayName: 'Deploy to the dev environment'
-#   #   dependsOn: Build
-#   #   condition: |
-#   #     and
-#   #     (
-#   #       succeeded(),
-#   #       eq(variables['Build.SourceBranchName'], variables['releaseBranchName'])
-#   #     )
-#   #   jobs:
-#   #   - job: DeployARM
-#   #     displayName: Deploy ARM
-#   #     steps:
+  - stage: 'Dev'
+    displayName: 'Deploy to the dev environment'
+    dependsOn: Build
+    condition: |
+      and
+      (
+        succeeded(),
+        eq(variables['Build.SourceBranchName'], variables['releaseBranchName'])
+      )
+    jobs:
+    - job: CreateResourceGroup
+      displayName: Create Resource Group
+      steps:
       
-#   #     - task: AzureCLI@2
-#   #       displayName: Create Resource Group
-#   #       inputs:
-#   #         azureSubscription: $(ServiceConnectionName)
-#   #         scriptType: bash
-#   #         scriptLocation: inlineScript
-#   #         useGlobalConfig: false
-#   #         inlineScript: |
-#   #           az --version
-#   #           az group create --name $(resourceGroupName) --location $(deploymentDefaultLocation)
+      - task: AzureCLI@2
+        displayName: Create Resource Group
+        inputs:
+          azureSubscription: $(ServiceConnectionName)
+          scriptType: bash
+          scriptLocation: inlineScript
+          useGlobalConfig: false
+          inlineScript: |
+            az --version
+            az group create --name $(resourceGroupName) --location $(deploymentDefaultLocation)
 
-#   #     - task: AzureResourceManagerTemplateDeployment@3
-#   #       displayName: Deploy ARM Template
-#   #       inputs:
-#   #         connectedServiceName: $(ServiceConnectionName)
-#   #         deploymentName: $(Build.BuildNumber)
-#   #         location: $(deploymentDefaultLocation)
-#   #         resourceGroupName: $(ResourceGroupName)
-#   #         csmFile: deploy/main.bicep
-#   #         csmParametersFile: deploy/parameters.dev.json
-#   #         overrideParameters: -appName $(appName)
+    - template: pipeline-templates/deploy.yml
+
+
+
 
 #   #   - deployment: Deploy
 #   #     dependsOn: DeployARM

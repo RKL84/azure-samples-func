@@ -1,23 +1,7 @@
   jobs:
   - job: DeployARM
-    displayName: Deploy ARM
+    displayName: Deploy ARM template
     steps:
-    - template: pipeline-templates/deploy.yml
-      parameters:
-        bicepTemplatePath: $(Build.SourcesDirectory)/deploy/main.bicep
-        bicepTemplateParameterPath: $(Build.SourcesDirectory)/deploy/parameters.dev.json
-      
-    - task: AzureCLI@2
-      displayName: Create Resource Group
-      inputs:
-        azureSubscription: $(ServiceConnectionName)
-        scriptType: bash
-        scriptLocation: inlineScript
-        useGlobalConfig: false
-        inlineScript: |
-          az --version
-          az group create --name $(resourceGroupName) --location $(deploymentDefaultLocation)
-
     - task: AzureResourceManagerTemplateDeployment@3
       displayName: Deploy ARM Template
       inputs:
@@ -29,26 +13,26 @@
         csmParametersFile: deploy/parameters.dev.json
         overrideParameters: -appName $(appName)
 
-  - deployment: Deploy
-    dependsOn: DeployARM
-    displayName: Upload Code
-    pool:
-      vmImage: 'ubuntu-20.04'
-    condition: succeeded()
-    environment: dev
-    variables:
-    - group: Release
-    strategy:
-      runOnce:
-        deploy:
-          steps:
-          - download: current
-            artifact: FunctionApp
-          - task: AzureFunctionApp@1
-            displayName: 'Azure App Service Deploy: function'
-            inputs:
-              azureSubscription: $(ServiceConnectionName)
-              appName: func-$(appName)-dev
-              appType: 'functionApp'
-              package: '$(Pipeline.Workspace)/FunctionApp/$(buildConfiguration)/*.zip'
-              deploymentMethod: 'zipDeploy' 
+  # - deployment: Deploy
+  #   dependsOn: DeployARM
+  #   displayName: Upload Code
+  #   pool:
+  #     vmImage: 'ubuntu-20.04'
+  #   condition: succeeded()
+  #   environment: dev
+  #   variables:
+  #   - group: Release
+  #   strategy:
+  #     runOnce:
+  #       deploy:
+  #         steps:
+  #         - download: current
+  #           artifact: FunctionApp
+  #         - task: AzureFunctionApp@1
+  #           displayName: 'Azure App Service Deploy: function'
+  #           inputs:
+  #             azureSubscription: $(ServiceConnectionName)
+  #             appName: func-$(appName)-dev
+  #             appType: 'functionApp'
+  #             package: '$(Pipeline.Workspace)/FunctionApp/$(buildConfiguration)/*.zip'
+  #             deploymentMethod: 'zipDeploy' 
