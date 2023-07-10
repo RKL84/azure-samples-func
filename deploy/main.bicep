@@ -12,6 +12,8 @@ param location string = resourceGroup().location
 ])
 param runtime string = 'dotnet'
 param env string
+param storageAccountName string
+param sharedResourceGroupName string
 
 @description('Location for Application Insights')
 param appInsightsLocation string = resourceGroup().location
@@ -22,7 +24,6 @@ param resourceNameSuffix string = uniqueString(resourceGroup().id)
 
 
 var appServicePlanName = '${appName}-plan'
-var storageAccountName = 'st${appName}${env}'
 var functionAppName = 'func-${appName}-${env}'
 var functionWorkerRuntime = runtime
 var applicationInsightsName = appName
@@ -31,7 +32,7 @@ var buildNumber = uniqueString(resourceGroup().id)
 
 resource storageAccount 'Microsoft.Storage/storageAccounts@2021-06-01' existing = {
   name: storageAccountName
-  scope: resourceGroup('azure-shared-rg')
+  scope: resourceGroup(sharedResourceGroupName)
 }
 
 module applicationInsights 'br:acr10072023.azurecr.io/application-insights:1.2.20230709.4' = {

@@ -4,6 +4,12 @@
     "parameters": {
       "env": {
         "value": "dev"
+      },
+      "storageAccountName": {
+        "value": "stazshared0411dev"
+      },
+      "sharedResourceGroupName": {
+        "value": "azure-shared-rg"
       }
     }
   }
