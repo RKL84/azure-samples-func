@@ -56,4 +56,7 @@ stages:
             az --version
             az group create --name $(resourceGroupName) --location $(deploymentDefaultLocation)
 
-    # - template: pipeline-templates/deploy-infra.yml
+    - template: pipeline-templates/deploy-infra.yml
+      parameters:
+        bicepTemplateFilePath: $(Pipeline.Workspace)/Bicep/main.json
+        bicepTemplateFileParameterPath: $(Build.SourcesDirectory)/deploy/parameters.dev.json
