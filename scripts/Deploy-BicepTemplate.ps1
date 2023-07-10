@@ -11,7 +11,7 @@ param(
 
 $DeploymentName  =(([io.path]::GetFileNameWithoutExtension($TemplateFile)) + '-' + ((Get-Date).ToUniversalTime()).ToString('MMdd-HHmm'))
 
-New-AzureRmResourceGroupDeployment `
+New-AzResourceGroupDeployment `
   -Name $DeploymentName `
   -ResourceGroupName $ResourceGroupName `
   -TemplateFile $TemplateFile
