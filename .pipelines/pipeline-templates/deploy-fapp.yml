@@ -6,6 +6,7 @@
 
   jobs:
   - deployment: UploadFunctionAppCode
+    dependsOn: DeployARM
     displayName: Upload Function App Code
     pool:
       vmImage: 'ubuntu-20.04'
