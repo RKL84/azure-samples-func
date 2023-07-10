@@ -1,8 +1,6 @@
   parameters:
   - name: templateFilePath
     type: string
-  - name: templateFilePath
-    type: string
   - name: appName
     type: string
   
