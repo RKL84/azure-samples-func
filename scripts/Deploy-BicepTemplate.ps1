@@ -16,4 +16,3 @@ New-AzResourceGroupDeployment `
   -ResourceGroupName $ResourceGroupName `
   -TemplateFile $TemplateFile `
   -TemplateParameterFile $TemplateParameterFile
- 
