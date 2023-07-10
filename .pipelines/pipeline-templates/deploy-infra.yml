@@ -58,4 +58,4 @@
                 -ResourceGroupName "$(ResourceGroupName)" `
                 -Location "$(deploymentDefaultLocation)" `
                 -TemplateFile  "${{ parameters.templateFilePath }}" `
-                -TemplateParametersFile "${{ parameters.templateParameterFilePath }}"
+                -TemplateParameterFile "${{ parameters.templateParameterFilePath }}"

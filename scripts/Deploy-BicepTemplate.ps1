@@ -2,7 +2,7 @@ param(
  $ResourceGroupName,
  $Location,
  $TemplateFile,
- $TemplateParametersFile
+ $TemplateParameterFile
 )
 
 # $resourceGroup = Get-AzResourceGroup -Name $ResourceGroupName -ErrorAction SilentlyContinue
@@ -15,5 +15,5 @@ New-AzResourceGroupDeployment `
   -Name $DeploymentName `
   -ResourceGroupName $ResourceGroupName `
   -TemplateFile $TemplateFile
-  -TemplateParametersFile $TemplateParametersFile
+  -TemplateParameterFile $TemplateParameterFile
  
