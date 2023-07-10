@@ -80,11 +80,20 @@ module functionAppSettingsModule 'templates/FunctionAppSettings.bicep' = {
 }
 
 module storageAccount_roleAssignments 'storage-account-role-assignment.bicep' = {
-  name: 'data-facory-storage-account-role-assignment'
+  name: 'storageAccount_roleAssignments-${buildNumber}'
   scope: resourceGroup()
   params:{
     storageAccountName: storageAccountName
     roleId: 'Storage Account Contributor'
+    principalId: functionAppModule.outputs.principalId
+  }
+}
+
+module keyVault_roleAssignments 'key-vault-role-assignment.bicep' = {
+  name: 'keyVault_roleAssignments-${buildNumber}'
+  params:{
+    keyVaultName: keyVaultName
+    roleId: 'Key Vault Secrets User'
     principalId: functionAppModule.outputs.principalId
   }
 }

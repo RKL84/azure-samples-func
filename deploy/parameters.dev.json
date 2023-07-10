@@ -10,6 +10,9 @@
       },
       "sharedResourceGroupName": {
         "value": "azure-shared-rg"
+      },
+      "keyVaultName": {
+        "value": "kv-azshared0411-dev"
       }
     }
   }
