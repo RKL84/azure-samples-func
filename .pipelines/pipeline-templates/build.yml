@@ -61,7 +61,6 @@ stages:
           scriptType: 'pscore'
           scriptLocation: 'inlineScript'
           inlineScript: |
-            echo $(bicepTemplatePath)
             az bicep restore --file deploy/main.bicep
             az bicep build --file deploy/parameters.dev.json --outfile $(Build.SourcesDirectory)/main.json
 
