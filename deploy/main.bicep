@@ -4,14 +4,6 @@ param appName string = 'azsample0411'
 @description('The Azure region into which the resources should be deployed.')
 param location string = resourceGroup().location
 
-@description('Storage Account type')
-@allowed([
-  'Standard_LRS'
-  'Standard_GRS'
-  'Standard_RAGRS'
-])
-param storageAccountType string = 'Standard_LRS'
-
 @description('The language worker runtime to load in the function app.')
 @allowed([
   'node'
@@ -31,20 +23,14 @@ param resourceNameSuffix string = uniqueString(resourceGroup().id)
 
 var appServicePlanName = '${appName}-plan'
 var storageAccountName = 'st${appName}${env}'
-var keyVaultName = take('kv-shared-${env}-${resourceNameSuffix}',24)
 var functionAppName = 'func-${appName}-${env}'
 var functionWorkerRuntime = runtime
 var applicationInsightsName = appName
 
 var buildNumber = uniqueString(resourceGroup().id)
 
-module storageAccount 'br:acr10072023.azurecr.io/storage-account:1.2.20230709.1' = {
-  name: 'stvmdeploy-${buildNumber}'
-  params: {
-    name: storageAccountName
-    sku: storageAccountType
-    location: location
-  }
+resource storageAccount 'Microsoft.Storage/storageAccounts@2021-06-01' existing = {
+  name: storageAccountName
 }
 
 module applicationInsights 'br:acr10072023.azurecr.io/application-insights:1.2.20230709.4' = {
@@ -72,17 +58,7 @@ module functionAppModule 'br:acr10072023.azurecr.io/function-app:1.2.20230709.1'
   }
 }
 
-module keyVaultModule 'br:acr10072023.azurecr.io/key-vault:1.2.20230709.1' = {
-  name: 'kvdeploy-${buildNumber}'
-  params: {
-    name: keyVaultName
-    location: location
-    sku: 'standard'
-    funcTenantId: functionAppModule.outputs.tenantId
-    funcPrincipalId: functionAppModule.outputs.principalId
-  }
-}
-
+var storageAccountConnectionString = 'DefaultEndpointsProtocol=https;AccountName=${storageAccount.name};EndpointSuffix=${environment().suffixes.storage};AccountKey=${listKeys(storageAccount.id, storageAccount.apiVersion).keys[0].value}'
 module functionAppSettingsModule 'templates/FunctionAppSettings.bicep' = {
   name: 'siteconf-${buildNumber}'
   params: {
@@ -90,6 +66,6 @@ module functionAppSettingsModule 'templates/FunctionAppSettings.bicep' = {
     // databaseConnectionString: keyVaultModule.outputs.databaseConnectionStringSecretUri
     functionAppName: functionAppModule.outputs.functionAppName
     functionAppRuntime: functionWorkerRuntime
-    storageAccountConnectionString: storageAccount.outputs.storageAccountConnectionString
+    storageAccountConnectionString: storageAccountConnectionString
   }
 }
