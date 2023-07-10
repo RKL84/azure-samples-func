@@ -52,7 +52,7 @@
               pwsh: false
               azurePowerShellVersion: 'LatestVersion'
               ScriptType: 'FilePath'
-              ScriptPath: '${{ parameters.package}}/scripts/DeployBicepTemplate.ps1'
+              ScriptPath: '$(Build.SourcesDirectory)/scripts/DeployBicepTemplate.ps1'
               ScriptArguments:
                 -ResourceGroupName "$(ResourceGroupName)" `
                 -Location "$(deploymentDefaultLocation)" `
