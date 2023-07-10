@@ -21,67 +21,82 @@ variables:
 #   always: false 
 
 stages:
-  - template: pipeline-templates/build.yml
-    parameters:
-      bicepTemplatePath: $(Build.SourcesDirectory)/deploy/main.bicep
-      bicepTemplateParameterPath: $(Build.SourcesDirectory)/deploy/parameters.dev.json
+  - stage: 'Build'
+    displayName: 'Build'
+    jobs: 
+      - template: pipeline-templates/build-code.yml
+      - template: pipeline-templates/build-infra.yml
+        parameters:
+          bicepTemplatePath: $(Build.SourcesDirectory)/deploy/main.bicep
+          bicepTemplateParameterPath: $(Build.SourcesDirectory)/deploy/parameters.dev.json
 
-  - stage: 'Dev'
-    displayName: 'Deploy to the dev environment'
-    dependsOn: Build
-    condition: |
-      and
-      (
-        succeeded(),
-        eq(variables['Build.SourceBranchName'], variables['releaseBranchName'])
-      )
-    jobs:
-    - job: DeployARM
-      displayName: Deploy ARM
-      steps:
+# stages:
+#   - template: pipeline-templates/build.yml
+#     parameters:
+#       bicepTemplatePath: $(Build.SourcesDirectory)/deploy/main.bicep
+#       bicepTemplateParameterPath: $(Build.SourcesDirectory)/deploy/parameters.dev.json
+
+#   - template: pipeline-templates/build.yml
+#     parameters:
+#       bicepTemplatePath: $(Build.SourcesDirectory)/deploy/main.bicep
+#       bicepTemplateParameterPath: $(Build.SourcesDirectory)/deploy/parameters.dev.json
+
+#   # - stage: 'Dev'
+#   #   displayName: 'Deploy to the dev environment'
+#   #   dependsOn: Build
+#   #   condition: |
+#   #     and
+#   #     (
+#   #       succeeded(),
+#   #       eq(variables['Build.SourceBranchName'], variables['releaseBranchName'])
+#   #     )
+#   #   jobs:
+#   #   - job: DeployARM
+#   #     displayName: Deploy ARM
+#   #     steps:
       
-      - task: AzureCLI@2
-        displayName: Create Resource Group
-        inputs:
-          azureSubscription: $(ServiceConnectionName)
-          scriptType: bash
-          scriptLocation: inlineScript
-          useGlobalConfig: false
-          inlineScript: |
-            az --version
-            az group create --name $(resourceGroupName) --location $(deploymentDefaultLocation)
+#   #     - task: AzureCLI@2
+#   #       displayName: Create Resource Group
+#   #       inputs:
+#   #         azureSubscription: $(ServiceConnectionName)
+#   #         scriptType: bash
+#   #         scriptLocation: inlineScript
+#   #         useGlobalConfig: false
+#   #         inlineScript: |
+#   #           az --version
+#   #           az group create --name $(resourceGroupName) --location $(deploymentDefaultLocation)
 
-      - task: AzureResourceManagerTemplateDeployment@3
-        displayName: Deploy ARM Template
-        inputs:
-          connectedServiceName: $(ServiceConnectionName)
-          deploymentName: $(Build.BuildNumber)
-          location: $(deploymentDefaultLocation)
-          resourceGroupName: $(ResourceGroupName)
-          csmFile: deploy/main.bicep
-          csmParametersFile: deploy/parameters.dev.json
-          overrideParameters: -appName $(appName)
+#   #     - task: AzureResourceManagerTemplateDeployment@3
+#   #       displayName: Deploy ARM Template
+#   #       inputs:
+#   #         connectedServiceName: $(ServiceConnectionName)
+#   #         deploymentName: $(Build.BuildNumber)
+#   #         location: $(deploymentDefaultLocation)
+#   #         resourceGroupName: $(ResourceGroupName)
+#   #         csmFile: deploy/main.bicep
+#   #         csmParametersFile: deploy/parameters.dev.json
+#   #         overrideParameters: -appName $(appName)
 
-    - deployment: Deploy
-      dependsOn: DeployARM
-      displayName: Upload Code
-      pool:
-        vmImage: 'ubuntu-20.04'
-      condition: succeeded()
-      environment: dev
-      variables:
-      - group: Release
-      strategy:
-        runOnce:
-          deploy:
-            steps:
-            - download: current
-              artifact: FunctionApp
-            - task: AzureFunctionApp@1
-              displayName: 'Azure App Service Deploy: function'
-              inputs:
-                azureSubscription: $(ServiceConnectionName)
-                appName: func-$(appName)-dev
-                appType: 'functionApp'
-                package: '$(Pipeline.Workspace)/FunctionApp/$(buildConfiguration)/*.zip'
-                deploymentMethod: 'zipDeploy' 
+#   #   - deployment: Deploy
+#   #     dependsOn: DeployARM
+#   #     displayName: Upload Code
+#   #     pool:
+#   #       vmImage: 'ubuntu-20.04'
+#   #     condition: succeeded()
+#   #     environment: dev
+#   #     variables:
+#   #     - group: Release
+#   #     strategy:
+#   #       runOnce:
+#   #         deploy:
+#   #           steps:
+#   #           - download: current
+#   #             artifact: FunctionApp
+#   #           - task: AzureFunctionApp@1
+#   #             displayName: 'Azure App Service Deploy: function'
+#   #             inputs:
+#   #               azureSubscription: $(ServiceConnectionName)
+#   #               appName: func-$(appName)-dev
+#   #               appType: 'functionApp'
+#   #               package: '$(Pipeline.Workspace)/FunctionApp/$(buildConfiguration)/*.zip'
+#   #               deploymentMethod: 'zipDeploy' 
