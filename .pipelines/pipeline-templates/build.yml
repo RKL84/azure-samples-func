@@ -1,7 +1,7 @@
   parameters:
-  - name: bicepsTemplatePath
+  - name: bicepTemplatePath
     type: string
-  - name: bicepsTemplateParameterPath
+  - name: bicepTemplateParameterPath
     type: string
 
   jobs: 
@@ -58,8 +58,8 @@
           scriptType: 'bash'
           scriptLocation: 'inlineScript'
           inlineScript: |
-            az bicep restore --file $(bicepsTemplatePath)
-            az bicep build --file $(bicepsTemplatePath) --outfile $(Build.SourcesDirectory)/main.json
+            az bicep restore --file $(bicepTemplatePath)
+            az bicep build --file $(bicepTemplatePath) --outfile $(Build.SourcesDirectory)/main.json
 
       - publish: $(Build.SourcesDirectory)/main.json
         artifact: Bicep
@@ -72,6 +72,6 @@
           location: $(deploymentDefaultLocation)
           deploymentMode: Validation
           resourceGroupName: $(ResourceGroupName)
-          csmFile: $(bicepsTemplatePath)
-          csmParametersFile: $(bicepsTemplateParameterPath)
+          csmFile: $(bicepTemplatePath)
+          csmParametersFile: $(bicepTemplateParameterPath)
           overrideParameters: -appName $(appName)
