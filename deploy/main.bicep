@@ -84,34 +84,22 @@ module functionAppModule 'br:acrshr0411.azurecr.io/bicep/modules/microsoft.web.s
   }
 }
 
-// module functionAppSettingsModule 'templates/FunctionAppSettings.bicep' = {
-//   name: 'siteconf-${buildNumber}'
-//   params: {
-//     applicationInsightsKey: applicationInsights.outputs.applicationInsightsKey
-//     // databaseConnectionString: keyVaultModule.outputs.databaseConnectionStringSecretUri
-//     functionAppName: functionAppModule.outputs.name
-//     functionAppRuntime: functionWorkerRuntime
-//     storageAccountConnectionString: storageAccountConnectionString
-//     keyVaultUri: keyVault.properties.vaultUri
-//   }
-// }
+module storageAccount_roleAssignments 'storage-account-role-assignment.bicep' = {
+  name: 'storageAccount_roleAssignments-${buildNumber}'
+  scope: resourceGroup(sharedResourceGroupName)
+  params:{
+    storageAccountName: storageAccountName
+    roleId: '17d1049b-9a84-46fb-8f53-869881c3d3ab' //'Storage Account Contributor'
+    principalId: functionAppModule.outputs.systemAssignedPrincipalId
+  }
+}
 
-// module storageAccount_roleAssignments 'storage-account-role-assignment.bicep' = {
-//   name: 'storageAccount_roleAssignments-${buildNumber}'
-//   scope: resourceGroup(sharedResourceGroupName)
-//   params:{
-//     storageAccountName: storageAccountName
-//     roleId: '17d1049b-9a84-46fb-8f53-869881c3d3ab' //'Storage Account Contributor'
-//     principalId: functionAppModule.outputs.resourceId
-//   }
-// }
-
-// module keyVault_roleAssignments 'key-vault-role-assignment.bicep' = {
-//   name: 'keyVault_roleAssignments-${buildNumber}'
-//   scope: resourceGroup(sharedResourceGroupName)
-//   params:{
-//     keyVaultName: keyVaultName
-//     roleId: '4633458b-17de-408a-b874-0445c86b69e6' //'Key Vault Secrets User'
-//     principalId: functionAppModule.outputs.resourceId
-//   }
-// }
+module keyVault_roleAssignments 'key-vault-role-assignment.bicep' = {
+  name: 'keyVault_roleAssignments-${buildNumber}'
+  scope: resourceGroup(sharedResourceGroupName)
+  params:{
+    keyVaultName: keyVaultName
+    roleId: '4633458b-17de-408a-b874-0445c86b69e6' //'Key Vault Secrets User'
+    principalId: functionAppModule.outputs.systemAssignedPrincipalId
+  }
+}
