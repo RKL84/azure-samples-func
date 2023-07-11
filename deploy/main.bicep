@@ -84,7 +84,7 @@ module storageAccount_roleAssignments 'storage-account-role-assignment.bicep' = 
   scope: resourceGroup(sharedResourceGroupName)
   params:{
     storageAccountName: storageAccountName
-    roleId: 'Storage Account Contributor'
+    roleId: '17d1049b-9a84-46fb-8f53-869881c3d3ab' //'Storage Account Contributor'
     principalId: functionAppModule.outputs.principalId
   }
 }
@@ -94,7 +94,7 @@ module keyVault_roleAssignments 'key-vault-role-assignment.bicep' = {
   scope: resourceGroup(sharedResourceGroupName)
   params:{
     keyVaultName: keyVaultName
-    roleId: 'Key Vault Secrets User'
+    roleId: '4633458b-17de-408a-b874-0445c86b69e6' //'Key Vault Secrets User'
     principalId: functionAppModule.outputs.principalId
   }
 }
