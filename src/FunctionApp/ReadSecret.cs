@@ -21,7 +21,7 @@ namespace AzureSamples.FunctionApp
 
         //https://learn.microsoft.com/en-us/dotnet/api/overview/azure/service-to-service-authentication?view=azure-dotnet
         [FunctionName("ReadSecret")]
-        public  async Task<IActionResult> Run(
+        public async Task<IActionResult> Run(
            [HttpTrigger(AuthorizationLevel.Anonymous, "get", Route = null)] HttpRequest req, ILogger log)
         {
             string secretName = req.Query["secret"];
@@ -36,7 +36,7 @@ namespace AzureSamples.FunctionApp
             }
             catch (Exception ex)
             {
-                throw ex;
+                return new BadRequestObjectResult(ex.ToString());
             }
 
             log.LogInformation("Secret Value retrieved from KeyVault.");
