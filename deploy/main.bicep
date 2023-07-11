@@ -105,7 +105,7 @@ module keyVault_roleAssignments 'br:acrshr0411.azurecr.io/bicep/modules/microsof
   name: 'keyVault_roleAssignments-${buildNumber}'
   scope: resourceGroup(sharedResourceGroupName)
   params:{
-    resourceId: storageAccount.id
+    resourceId: keyVault.id
     roleAssignments: [
         {
             roleDefinitionIdOrName: 'Key Vault Secrets User'
