@@ -67,6 +67,7 @@ module functionAppModule 'br:acrshr0411.azurecr.io/bicep/modules/microsoft.web.s
   params: {
     // Required parameters
     kind: 'functionapp'
+    systemAssignedIdentity: true
     name: functionAppName
     location: location
     serverFarmResourceId: appServicePlan.outputs.resourceId
