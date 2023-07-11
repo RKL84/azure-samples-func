@@ -4,7 +4,7 @@ param principalId string
 param roleId string
 
 // Get a reference to the storage account
-resource keyVault 'Microsoft.Storage/storageAccounts@2019-06-01' existing = {
+resource keyVault 'Microsoft.KeyVault/vaults@2023-02-01' existing = {
   name: keyVaultName
 }
 
