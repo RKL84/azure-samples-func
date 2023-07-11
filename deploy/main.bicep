@@ -35,12 +35,12 @@ resource storageAccount 'Microsoft.Storage/storageAccounts@2021-06-01' existing 
   name: storageAccountName
   scope: resourceGroup(sharedResourceGroupName)
 }
+var storageAccountConnectionString = 'DefaultEndpointsProtocol=https;AccountName=${storageAccount.name};EndpointSuffix=${environment().suffixes.storage};AccountKey=${listKeys(storageAccount.id, storageAccount.apiVersion).keys[0].value}'
 
 resource keyVault 'Microsoft.KeyVault/vaults@2023-02-01' existing =  {
    name: keyVaultName
    scope: resourceGroup(sharedResourceGroupName)
 }
-
 
 module applicationInsights 'br:acr10072023.azurecr.io/application-insights:1.2.20230709.4' = {
   name: 'appinsightdeploy-${buildNumber}'
@@ -70,6 +70,14 @@ module functionAppModule 'br:acrshr0411.azurecr.io/bicep/modules/microsoft.web.s
     name: functionAppName
     location: location
     serverFarmResourceId: appServicePlan.outputs.resourceId
+    storageAccountId: storageAccount.id
+    appSettingsKeyValuePairs: {
+      AzureFunctionsJobHost__logging__logLevel__default: 'Trace'
+      FUNCTIONS_EXTENSION_VERSION: '~4'
+      FUNCTIONS_WORKER_RUNTIME: 'dotnet'
+      storageAccountConnectionString: storageAccountConnectionString
+      keyVaultUri: keyVault.properties.vaultUri
+    }
     // siteConfig: {
     //   alwaysOn: true
     // }
@@ -77,18 +85,17 @@ module functionAppModule 'br:acrshr0411.azurecr.io/bicep/modules/microsoft.web.s
 }
 
 
-var storageAccountConnectionString = 'DefaultEndpointsProtocol=https;AccountName=${storageAccount.name};EndpointSuffix=${environment().suffixes.storage};AccountKey=${listKeys(storageAccount.id, storageAccount.apiVersion).keys[0].value}'
-module functionAppSettingsModule 'templates/FunctionAppSettings.bicep' = {
-  name: 'siteconf-${buildNumber}'
-  params: {
-    applicationInsightsKey: applicationInsights.outputs.applicationInsightsKey
-    // databaseConnectionString: keyVaultModule.outputs.databaseConnectionStringSecretUri
-    functionAppName: functionAppModule.outputs.name
-    functionAppRuntime: functionWorkerRuntime
-    storageAccountConnectionString: storageAccountConnectionString
-    keyVaultUri: keyVault.properties.vaultUri
-  }
-}
+// module functionAppSettingsModule 'templates/FunctionAppSettings.bicep' = {
+//   name: 'siteconf-${buildNumber}'
+//   params: {
+//     applicationInsightsKey: applicationInsights.outputs.applicationInsightsKey
+//     // databaseConnectionString: keyVaultModule.outputs.databaseConnectionStringSecretUri
+//     functionAppName: functionAppModule.outputs.name
+//     functionAppRuntime: functionWorkerRuntime
+//     storageAccountConnectionString: storageAccountConnectionString
+//     keyVaultUri: keyVault.properties.vaultUri
+//   }
+// }
 
 // module storageAccount_roleAssignments 'storage-account-role-assignment.bicep' = {
 //   name: 'storageAccount_roleAssignments-${buildNumber}'
