@@ -50,22 +50,32 @@ module applicationInsights 'br:acr10072023.azurecr.io/application-insights:1.2.2
   }
 }
 
-module appServicePlan 'br:acr10072023.azurecr.io/appservice-plan:1.2.20230709.1'= {
+module appServicePlan 'br:acrshr0411.azurecr.io/bicep/modules/microsoft.web.serverfarms:latest'= {
   name: 'plandeploy-${buildNumber}'
   params: {
     name: appServicePlanName
     location: location
+    sku: {
+      name: 'Y1'
+      tier: 'Dynamic'
+    }
   }
 }
 
-module functionAppModule 'br:acr10072023.azurecr.io/function-app:1.2.20230709.1' = {
-  name: 'funcdeploy-${buildNumber}'
+module functionAppModule 'br:acrshr0411.azurecr.io/bicep/modules/microsoft.web.sites:latest' = {
+  name: '${uniqueString(deployment().name, location)}-test-wsfamin'
   params: {
+    // Required parameters
+    kind: 'functionapp'
     name: functionAppName
     location: location
-    planId: appServicePlan.outputs.planId
+    serverFarmResourceId: appServicePlan.outputs.resourceId
+    // siteConfig: {
+    //   alwaysOn: true
+    // }
   }
 }
+
 
 var storageAccountConnectionString = 'DefaultEndpointsProtocol=https;AccountName=${storageAccount.name};EndpointSuffix=${environment().suffixes.storage};AccountKey=${listKeys(storageAccount.id, storageAccount.apiVersion).keys[0].value}'
 module functionAppSettingsModule 'templates/FunctionAppSettings.bicep' = {
@@ -73,29 +83,29 @@ module functionAppSettingsModule 'templates/FunctionAppSettings.bicep' = {
   params: {
     applicationInsightsKey: applicationInsights.outputs.applicationInsightsKey
     // databaseConnectionString: keyVaultModule.outputs.databaseConnectionStringSecretUri
-    functionAppName: functionAppModule.outputs.functionAppName
+    functionAppName: functionAppModule.outputs.name
     functionAppRuntime: functionWorkerRuntime
     storageAccountConnectionString: storageAccountConnectionString
     keyVaultUri: keyVault.properties.vaultUri
   }
 }
 
-module storageAccount_roleAssignments 'storage-account-role-assignment.bicep' = {
-  name: 'storageAccount_roleAssignments-${buildNumber}'
-  scope: resourceGroup(sharedResourceGroupName)
-  params:{
-    storageAccountName: storageAccountName
-    roleId: '17d1049b-9a84-46fb-8f53-869881c3d3ab' //'Storage Account Contributor'
-    principalId: functionAppModule.outputs.principalId
-  }
-}
+// module storageAccount_roleAssignments 'storage-account-role-assignment.bicep' = {
+//   name: 'storageAccount_roleAssignments-${buildNumber}'
+//   scope: resourceGroup(sharedResourceGroupName)
+//   params:{
+//     storageAccountName: storageAccountName
+//     roleId: '17d1049b-9a84-46fb-8f53-869881c3d3ab' //'Storage Account Contributor'
+//     principalId: functionAppModule.outputs.principalId
+//   }
+// }
 
-module keyVault_roleAssignments 'key-vault-role-assignment.bicep' = {
-  name: 'keyVault_roleAssignments-${buildNumber}'
-  scope: resourceGroup(sharedResourceGroupName)
-  params:{
-    keyVaultName: keyVaultName
-    roleId: '4633458b-17de-408a-b874-0445c86b69e6' //'Key Vault Secrets User'
-    principalId: functionAppModule.outputs.principalId
-  }
-}
+// module keyVault_roleAssignments 'key-vault-role-assignment.bicep' = {
+//   name: 'keyVault_roleAssignments-${buildNumber}'
+//   scope: resourceGroup(sharedResourceGroupName)
+//   params:{
+//     keyVaultName: keyVaultName
+//     roleId: '4633458b-17de-408a-b874-0445c86b69e6' //'Key Vault Secrets User'
+//     principalId: functionAppModule.outputs.principalId
+//   }
+// }
