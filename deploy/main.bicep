@@ -76,6 +76,7 @@ module functionAppSettingsModule 'templates/FunctionAppSettings.bicep' = {
     functionAppName: functionAppModule.outputs.functionAppName
     functionAppRuntime: functionWorkerRuntime
     storageAccountConnectionString: storageAccountConnectionString
+    keyVaultUri: keyVault.properties.vaultUri
   }
 }
 

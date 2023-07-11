@@ -18,6 +18,10 @@ param applicationInsightsKey string
 @secure()
 param storageAccountConnectionString string
 
+@description('Storage Account connection string')
+@secure()
+param keyVaultUri string
+
 // @description('Key Vault URI Connection String reference')
 // @secure()
 // param databaseConnectionString string
@@ -34,7 +38,6 @@ resource functionAppSettings 'Microsoft.Web/sites/config@2021-03-01' = {
     FUNCTIONS_EXTENSION_VERSION: function_extension_version
     APPINSIGHTS_INSTRUMENTATIONKEY: applicationInsightsKey
     FUNCTIONS_WORKER_RUNTIME: functionAppRuntime
-    // WEBSITE_ADD_SITENAME_BINDINGS_IN_APPHOST_CONFIG: 1
-    // DatabaseConnectionString: databaseConnectionStringKeyVaultRef
+    keyVaultUri: keyVaultUri
   }
 }
