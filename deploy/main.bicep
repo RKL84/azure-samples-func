@@ -81,7 +81,7 @@ module functionAppSettingsModule 'templates/FunctionAppSettings.bicep' = {
 
 module storageAccount_roleAssignments 'storage-account-role-assignment.bicep' = {
   name: 'storageAccount_roleAssignments-${buildNumber}'
-  scope: resourceGroup()
+  scope: resourceGroup(sharedResourceGroupName)
   params:{
     storageAccountName: storageAccountName
     roleId: 'Storage Account Contributor'
@@ -91,6 +91,7 @@ module storageAccount_roleAssignments 'storage-account-role-assignment.bicep' = 
 
 module keyVault_roleAssignments 'key-vault-role-assignment.bicep' = {
   name: 'keyVault_roleAssignments-${buildNumber}'
+  scope: resourceGroup(sharedResourceGroupName)
   params:{
     keyVaultName: keyVaultName
     roleId: 'Key Vault Secrets User'
