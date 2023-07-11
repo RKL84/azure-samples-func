@@ -42,13 +42,13 @@ resource keyVault 'Microsoft.KeyVault/vaults@2023-02-01' existing =  {
    scope: resourceGroup(sharedResourceGroupName)
 }
 
-module applicationInsights 'br:acr10072023.azurecr.io/application-insights:1.2.20230709.4' = {
-  name: 'appinsightdeploy-${buildNumber}'
-  params: {
-    name: applicationInsightsName
-    location: appInsightsLocation
-  }
-}
+// module applicationInsights 'br:acrshr0411.azurecr.io/bicep/modules/microsoft.insights.components:latest' = {
+//   name: 'appinsightdeploy-${buildNumber}'
+//   params: {
+//     name: applicationInsightsName
+//     location: appInsightsLocation
+//   }
+// }
 
 module appServicePlan 'br:acrshr0411.azurecr.io/bicep/modules/microsoft.web.serverfarms:latest'= {
   name: 'plandeploy-${buildNumber}'
@@ -74,7 +74,7 @@ module functionAppModule 'br:acrshr0411.azurecr.io/bicep/modules/microsoft.web.s
     appSettingsKeyValuePairs: {
       AzureFunctionsJobHost__logging__logLevel__default: 'Trace'
       FUNCTIONS_EXTENSION_VERSION: '~4'
-      FUNCTIONS_WORKER_RUNTIME: 'dotnet'
+      FUNCTIONS_WORKER_RUNTIME: functionWorkerRuntime
       storageAccountConnectionString: storageAccountConnectionString
       keyVaultUri: keyVault.properties.vaultUri
     }
@@ -83,7 +83,6 @@ module functionAppModule 'br:acrshr0411.azurecr.io/bicep/modules/microsoft.web.s
     // }
   }
 }
-
 
 // module functionAppSettingsModule 'templates/FunctionAppSettings.bicep' = {
 //   name: 'siteconf-${buildNumber}'
@@ -97,22 +96,22 @@ module functionAppModule 'br:acrshr0411.azurecr.io/bicep/modules/microsoft.web.s
 //   }
 // }
 
-// module storageAccount_roleAssignments 'storage-account-role-assignment.bicep' = {
-//   name: 'storageAccount_roleAssignments-${buildNumber}'
-//   scope: resourceGroup(sharedResourceGroupName)
-//   params:{
-//     storageAccountName: storageAccountName
-//     roleId: '17d1049b-9a84-46fb-8f53-869881c3d3ab' //'Storage Account Contributor'
-//     principalId: functionAppModule.outputs.principalId
-//   }
-// }
+module storageAccount_roleAssignments 'storage-account-role-assignment.bicep' = {
+  name: 'storageAccount_roleAssignments-${buildNumber}'
+  scope: resourceGroup(sharedResourceGroupName)
+  params:{
+    storageAccountName: storageAccountName
+    roleId: '17d1049b-9a84-46fb-8f53-869881c3d3ab' //'Storage Account Contributor'
+    principalId: functionAppModule.outputs.resourceId
+  }
+}
 
-// module keyVault_roleAssignments 'key-vault-role-assignment.bicep' = {
-//   name: 'keyVault_roleAssignments-${buildNumber}'
-//   scope: resourceGroup(sharedResourceGroupName)
-//   params:{
-//     keyVaultName: keyVaultName
-//     roleId: '4633458b-17de-408a-b874-0445c86b69e6' //'Key Vault Secrets User'
-//     principalId: functionAppModule.outputs.principalId
-//   }
-// }
+module keyVault_roleAssignments 'key-vault-role-assignment.bicep' = {
+  name: 'keyVault_roleAssignments-${buildNumber}'
+  scope: resourceGroup(sharedResourceGroupName)
+  params:{
+    keyVaultName: keyVaultName
+    roleId: '4633458b-17de-408a-b874-0445c86b69e6' //'Key Vault Secrets User'
+    principalId: functionAppModule.outputs.resourceId
+  }
+}
