@@ -13,6 +13,9 @@
       },
       "keyVaultName": {
         "value": "kv-azshared0411-dev"
+      },
+      "logAnalyticsWorkspaceName": {
+        "value": "lwazshared0411"
       }
     }
   }

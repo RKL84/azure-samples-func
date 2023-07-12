@@ -14,6 +14,7 @@ param runtime string = 'dotnet'
 param env string
 param keyVaultName string
 param storageAccountName string
+param logAnalyticsWorkspaceName string
 param sharedResourceGroupName string
 
 @description('Location for Application Insights')
@@ -42,13 +43,19 @@ resource keyVault 'Microsoft.KeyVault/vaults@2023-02-01' existing =  {
    scope: resourceGroup(sharedResourceGroupName)
 }
 
-// module applicationInsights 'br:acrshr0411.azurecr.io/bicep/modules/microsoft.insights.components:latest' = {
-//   name: 'appinsightdeploy-${buildNumber}'
-//   params: {
-//     name: applicationInsightsName
-//     location: appInsightsLocation
-//   }
-// }
+resource logAnalytics 'Microsoft.OperationalInsights/workspaces@2022-10-01' existing = {
+  name: logAnalyticsWorkspaceName
+  scope: resourceGroup(sharedResourceGroupName)
+}
+
+module applicationInsights 'br:acrshr0411.azurecr.io/bicep/modules/microsoft.insights.components:latest' = {
+  name: 'appinsightdeploy-${buildNumber}'
+  params: {
+    name: applicationInsightsName
+    location: appInsightsLocation
+    workspaceResourceId: logAnalytics.id
+  }
+}
 
 module appServicePlan 'br:acrshr0411.azurecr.io/bicep/modules/microsoft.web.serverfarms:latest'= {
   name: 'plandeploy-${buildNumber}'
@@ -62,6 +69,23 @@ module appServicePlan 'br:acrshr0411.azurecr.io/bicep/modules/microsoft.web.serv
   }
 }
 
+resource diagnosticLogs 'Microsoft.Insights/diagnosticSettings@2021-05-01-preview' = {
+  name: appServicePlan.name
+  properties: {
+    workspaceId: logAnalytics.id
+    logs: [
+      {
+        category: 'AllMetrics'
+        enabled: true
+        retentionPolicy: {
+          days: 30
+          enabled: true 
+        }
+      }
+    ]
+  }
+}
+
 module functionAppModule 'br:acrshr0411.azurecr.io/bicep/modules/microsoft.web.sites:latest' = {
   name: '${uniqueString(deployment().name, location)}-test-wsfamin'
   params: {
@@ -72,6 +96,7 @@ module functionAppModule 'br:acrshr0411.azurecr.io/bicep/modules/microsoft.web.s
     location: location
     serverFarmResourceId: appServicePlan.outputs.resourceId
     storageAccountId: storageAccount.id
+    appInsightId: applicationInsights.outputs.resourceId
     appSettingsKeyValuePairs: {
       AzureFunctionsJobHost__logging__logLevel__default: 'Trace'
       FUNCTIONS_EXTENSION_VERSION: '~4'
