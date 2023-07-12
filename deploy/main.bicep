@@ -9,8 +9,9 @@ param location string = resourceGroup().location
   'node'
   'dotnet'
   'java'
+  'dotnet-isolated'
 ])
-param runtime string = 'dotnet'
+param runtime string = 'dotnet-isolated'
 param env string
 param keyVaultName string
 param storageAccountName string
