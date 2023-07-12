@@ -1,46 +1,48 @@
 using System;
 using System.Threading.Tasks;
-using Azure.Identity;
-using Azure.Security.KeyVault.Secrets;
-using Microsoft.AspNetCore.Http;
-using Microsoft.AspNetCore.Mvc;
-using Microsoft.Azure.WebJobs;
-using Microsoft.Azure.WebJobs.Extensions.Http;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
+using Microsoft.Azure.Functions.Worker;
+using Microsoft.Azure.Functions.Worker.Http;
+using Azure.Security.KeyVault.Secrets;
+using Azure.Identity;
+using System.Net;
 
 namespace AzureSamples.FunctionApp
 {
-    public class ReadSecret
+    public class ReadSecretPoc
     {
+        private readonly ILogger _logger;
         private readonly IConfiguration _configuration;
-        public ReadSecret(IConfiguration configuration)
+        public ReadSecretPoc(IConfiguration configuration, ILoggerFactory loggerFactory)
         {
             _configuration = configuration;
+            _logger = loggerFactory.CreateLogger<ReadSecretPoc>();
         }
 
         //https://learn.microsoft.com/en-us/dotnet/api/overview/azure/service-to-service-authentication?view=azure-dotnet
-        [FunctionName("ReadSecret")]
-        public async Task<IActionResult> Run(
-           [HttpTrigger(AuthorizationLevel.Anonymous, "get", Route = null)] HttpRequest req, ILogger log)
+        [Function("ReadSecret")]
+        public async Task<HttpResponseData> RunAsync([HttpTrigger(AuthorizationLevel.Function, "get")] HttpRequestData req)
         {
             string secretName = req.Query["secret"];
             string keyVaultUri = _configuration["keyVaultUri"];
-            log.LogInformation($"GetKeyVaultSecret request received for secret {secretName}");
+            _logger.LogInformation($"GetKeyVaultSecret request received for secret {secretName}");
             var keyVaultClient = new SecretClient(new Uri(keyVaultUri), new DefaultAzureCredential());
             string secretValue = string.Empty;
             try
             {
                 KeyVaultSecret secret = await keyVaultClient.GetSecretAsync(secretName);
                 secretValue = secret.Value;
+                var response = req.CreateResponse(HttpStatusCode.InternalServerError);
+                response.WriteString(secretValue);
+                return response;
             }
             catch (Exception ex)
             {
-                return new BadRequestObjectResult(ex.ToString());
-            }
-
-            log.LogInformation("Secret Value retrieved from KeyVault.");
-            return new OkObjectResult(secretValue);
+                var response = req.CreateResponse(HttpStatusCode.InternalServerError);
+                response.WriteString(ex.ToString());
+                return response;
+            } 
         }
     }
 }
