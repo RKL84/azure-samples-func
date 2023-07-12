@@ -69,23 +69,6 @@ module appServicePlan 'br:acrshr0411.azurecr.io/bicep/modules/microsoft.web.serv
   }
 }
 
-resource diagnosticLogs 'Microsoft.Insights/diagnosticSettings@2021-05-01-preview' = {
-  name: appServicePlan.name
-  properties: {
-    workspaceId: logAnalytics.id
-    logs: [
-      {
-        category: 'AllMetrics'
-        enabled: true
-        retentionPolicy: {
-          days: 30
-          enabled: true 
-        }
-      }
-    ]
-  }
-}
-
 module functionAppModule 'br:acrshr0411.azurecr.io/bicep/modules/microsoft.web.sites:latest' = {
   name: '${uniqueString(deployment().name, location)}-test-wsfamin'
   params: {
@@ -97,6 +80,7 @@ module functionAppModule 'br:acrshr0411.azurecr.io/bicep/modules/microsoft.web.s
     serverFarmResourceId: appServicePlan.outputs.resourceId
     storageAccountId: storageAccount.id
     appInsightId: applicationInsights.outputs.resourceId
+    diagnosticWorkspaceId: logAnalytics.id
     appSettingsKeyValuePairs: {
       AzureFunctionsJobHost__logging__logLevel__default: 'Trace'
       FUNCTIONS_EXTENSION_VERSION: '~4'
