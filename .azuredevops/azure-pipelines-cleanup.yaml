@@ -1,0 +1,36 @@
+trigger:
+- '*'
+
+parameters:
+  - name: resourceGroupNameToDelete
+    displayName: Resource Group Name to Delete
+    type: string
+    default: azure-samples-rg
+
+variables:
+- group: Release
+- name: buildConfiguration
+  value: Release
+- name: releaseBranchName
+  value: main
+- name: resourceGroupNameToDelete
+  value: azsample0411
+
+stages:
+  - stage: 'Cleanup'
+    displayName: 'Delete environment'
+    jobs:
+    - job: CreateResourceGroup
+      displayName: Create Resource Group
+      steps:
+      
+      - task: AzureCLI@2
+        displayName: Create Resource Group
+        inputs:
+          azureSubscription: $(ServiceConnectionName)
+          scriptType: bash
+          scriptLocation: inlineScript
+          useGlobalConfig: false
+          inlineScript: |
+            az --version
+            az group delete --name $(resourceGroupNameToDelete)
