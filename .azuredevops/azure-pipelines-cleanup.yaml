@@ -1,6 +1,5 @@
 trigger:
 - '*'
-
 parameters:
   - name: resourceGroupNameToDelete
     displayName: Resource Group Name to Delete
@@ -9,12 +8,6 @@ parameters:
 
 variables:
 - group: Release
-- name: buildConfiguration
-  value: Release
-- name: releaseBranchName
-  value: main
-- name: resourceGroupNameToDelete
-  value: azsample0411
 
 stages:
   - stage: 'Cleanup'
