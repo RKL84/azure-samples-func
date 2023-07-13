@@ -11,14 +11,14 @@ variables:
 
 stages:
   - stage: 'Cleanup'
-    displayName: 'Delete environment'
+    displayName: 'Delete Resource Group'
     jobs:
     - job: CreateResourceGroup
-      displayName: Create Resource Group
+      displayName: Delete Resource Group
       steps:
       
       - task: AzureCLI@2
-        displayName: Create Resource Group
+        displayName: Delete Resource Group
         inputs:
           azureSubscription: $(ServiceConnectionName)
           scriptType: bash
@@ -26,4 +26,4 @@ stages:
           useGlobalConfig: false
           inlineScript: |
             az --version
-            az group delete --name $(resourceGroupNameToDelete)
+            az group delete --name $(resourceGroupNameToDelete) --yes
