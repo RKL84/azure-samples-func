@@ -1,0 +1,89 @@
+  parameters:
+  - name: templateFilePath
+    type: string
+  - name: templateParameterFilePath
+    type: string
+  - name: appName
+    type: string
+  - name: resourceGroupName
+    type: string
+  - name: displayName
+    type: string
+    default: 'Publishing'
+  - name: serviceConnection
+    type: string
+    default: '$(ServiceConnectionName)'
+  # - name: poolName
+  #   type: string
+  #   default: '$(poolName)'
+  # - name: vmImage
+  #   type: string
+  #   default: '$(vmImage)'
+  - name: defaultJobTimeoutInMinutes
+    default: 120
+  
+  jobs:
+
+  - job:
+    displayName: ${{ parameters.displayName }}
+    timeoutInMinutes: ${{ parameters.defaultJobTimeoutInMinutes }}
+    # pool:
+    #   ${{ if ne(parameters.vmImage, '') }}:
+    #     vmImage: ${{ parameters.vmImage }}
+    #   ${{ if ne(parameters.poolName, '') }}:
+    #     name: ${{ parameters.poolName }}
+    steps:
+      # [Checkout Repositories] task(s)
+      #--------------------------------
+      - checkout: self
+        fetchDepth: 0
+
+      # [Agent] Prepare environment
+      #----------------------------
+      - task: PowerShell@2
+        displayName: 'Setup agent'
+        inputs:
+          targetType: inline
+          pwsh: true
+          script: |
+            # Load used functions
+            . (Join-Path '$(System.DefaultWorkingDirectory)' 'utilities' 'scripts' 'Set-EnvironmentOnAgent.ps1')
+
+            # Define PS modules to install on the runner
+            $Modules = @(
+                @{ Name = 'Az.Accounts' },
+                @{ Name = 'Az.ContainerRegistry' },
+                @{ Name = 'Az.Resources' }
+            )
+
+            # Set agent up
+            Set-EnvironmentOnAgent -PSModules $Modules
+          
+
+  - deployment: DeployARM
+    dependsOn: CreateResourceGroup
+    displayName: Deploy ARM template
+    condition: succeeded()
+    environment: dev
+    variables:
+    - group: Release
+    strategy:
+      runOnce:
+        deploy:
+          steps:
+          - checkout: self
+          - download: current
+            displayName: Download template
+          - task: AzurePowerShell@5
+            displayName: Deploy ARM Template
+            inputs:
+              azureSubscription: $(ServiceConnectionName)
+              pwsh: false
+              azurePowerShellVersion: 'LatestVersion'
+              ScriptType: 'FilePath'
+              ScriptPath: '$(Build.SourcesDirectory)/utilities/scripts/Deploy-BicepTemplate.ps1'
+              ScriptArguments:
+                -ResourceGroupName ${{ parameters.resourceGroupName }} `
+                -Location "$(deploymentDefaultLocation)" `
+                -TemplateFile  "${{ parameters.templateFilePath }}" `
+                -TemplateParameterFile "${{ parameters.templateParameterFilePath }}"

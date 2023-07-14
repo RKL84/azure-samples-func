@@ -3,6 +3,8 @@
     type: string
   - name: templateParameterFilePath
     type: string
+  - name: resourceGroupName
+    type: string
 
   jobs: 
   - job: 'infra_build'
@@ -30,7 +32,7 @@
           connectedServiceName: $(ServiceConnectionName)
           location: $(deploymentDefaultLocation)
           deploymentMode: Validation
-          resourceGroupName: $(ResourceGroupName)
+          resourceGroupName: ${{ parameters.resourceGroupName }}
           csmFile: ${{ parameters.bicepTemplateFilePath}}
-          csmParametersFile: ${{ parameters.templateParameterFilePath}}
+          csmParametersFile: ${{ parameters.templateParameterFilePath }}
           overrideParameters: -appName $(appName)

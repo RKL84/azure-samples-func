@@ -24,9 +24,10 @@ stages:
   - stage: 'Build'
     displayName: 'Build'
     jobs: 
-      - template: pipeline-templates/build-code.yml
-      - template: pipeline-templates/build-infra.yml
+      - template: pipeline-templates/jobs.buildCode.yml
+      - template: pipeline-templates/jobs.buildInfra.yml
         parameters:
+          resourceGroupName: $(ResourceGroupName)
           bicepTemplateFilePath: $(Build.SourcesDirectory)/deploy/main.bicep
           templateParameterFilePath: $(Build.SourcesDirectory)/deploy/parameters.dev.json
 
@@ -53,11 +54,12 @@ stages:
           useGlobalConfig: false
           inlineScript: |
             az --version
-            az group create --name $(resourceGroupName) --location $(deploymentDefaultLocation)
+            az group create --name $(ResourceGroupName) --location $(deploymentDefaultLocation)
 
-    - template: pipeline-templates/deploy-infra.yml
+    - template: pipeline-templates/jobs.deployInfra.yml
       parameters:
         appName: func-$(appName)-dev
+        resourceGroupName: $(ResourceGroupName)
         templateFilePath: $(Pipeline.Workspace)/Bicep/main.json
         templateParameterFilePath: $(Build.SourcesDirectory)/deploy/parameters.dev.json
     
