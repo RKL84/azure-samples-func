@@ -1,0 +1,7 @@
+variables:
+ pipelineFunctionsPath: 'utilities/scripts'
+ releaseBranchName: 'main'
+ buildConfiguration: 'Release'
+ azureServiceConnection: "AzureSamples"
+ location: "australiasoutheast"
+ appName: "azsample0411"

@@ -15,7 +15,7 @@
         name: BuildBicepModule
         displayName: Build Bicep
         inputs:
-          azureSubscription: $(ServiceConnectionName)
+          azureSubscription: $(azureServiceConnection)
           scriptType: 'pscore'
           scriptLocation: 'inlineScript'
           inlineScript: |
@@ -29,8 +29,8 @@
         name: RunPreflightValidation
         displayName: Run preflight validation
         inputs:
-          connectedServiceName: $(ServiceConnectionName)
-          location: $(deploymentDefaultLocation)
+          connectedServiceName: $(azureServiceConnection)
+          location: $(location)
           deploymentMode: Validation
           resourceGroupName: ${{ parameters.resourceGroupName }}
           csmFile: ${{ parameters.bicepTemplateFilePath}}

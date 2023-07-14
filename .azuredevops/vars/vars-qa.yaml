@@ -1,0 +1,4 @@
+variables:
+  environmentName: "qa"
+  resourceGroupName: "azure-shared-rg"
+  azureServiceConnection: "AzureSamples"

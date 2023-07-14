@@ -7,7 +7,7 @@ parameters:
     default: azure-samples-rg
 
 variables:
-- group: Release
+- template: vars/vars-global.yaml
 
 stages:
   - stage: 'Cleanup'
@@ -20,7 +20,7 @@ stages:
       - task: AzureCLI@2
         displayName: Delete Resource Group
         inputs:
-          azureSubscription: $(ServiceConnectionName)
+          azureSubscription: $(azureServiceConnection)
           scriptType: bash
           scriptLocation: inlineScript
           useGlobalConfig: false

@@ -12,8 +12,6 @@
       vmImage: 'ubuntu-20.04'
     condition: succeeded()
     environment: dev
-    variables:
-    - group: Release
     strategy:
       runOnce:
         deploy:
@@ -22,7 +20,7 @@
           - task: AzureFunctionApp@1
             displayName: 'Azure App Service Deploy: function'
             inputs:
-              azureSubscription: $(ServiceConnectionName)
+              azureSubscription: $(azureServiceConnection)
               appName: ${{ parameters.appName}}
               appType: 'functionApp'
               package: '${{ parameters.package}}'

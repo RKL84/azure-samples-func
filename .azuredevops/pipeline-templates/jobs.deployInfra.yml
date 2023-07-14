@@ -7,12 +7,9 @@
     type: string
   - name: resourceGroupName
     type: string
-  - name: displayName
-    type: string
-    default: 'Publishing'
   - name: serviceConnection
     type: string
-    default: '$(ServiceConnectionName)'
+    default: '$(azureServiceConnection)'
   # - name: poolName
   #   type: string
   #   default: '$(poolName)'
@@ -24,66 +21,97 @@
   
   jobs:
 
-  - job:
-    displayName: ${{ parameters.displayName }}
-    timeoutInMinutes: ${{ parameters.defaultJobTimeoutInMinutes }}
-    # pool:
-    #   ${{ if ne(parameters.vmImage, '') }}:
-    #     vmImage: ${{ parameters.vmImage }}
-    #   ${{ if ne(parameters.poolName, '') }}:
-    #     name: ${{ parameters.poolName }}
-    steps:
-      # [Checkout Repositories] task(s)
-      #--------------------------------
-      - checkout: self
-        fetchDepth: 0
-
-      # [Agent] Prepare environment
-      #----------------------------
-      - task: PowerShell@2
-        displayName: 'Setup agent'
-        inputs:
-          targetType: inline
-          pwsh: true
-          script: |
-            # Load used functions
-            . (Join-Path '$(System.DefaultWorkingDirectory)' 'utilities' 'scripts' 'Set-EnvironmentOnAgent.ps1')
-
-            # Define PS modules to install on the runner
-            $Modules = @(
-                @{ Name = 'Az.Accounts' },
-                @{ Name = 'Az.ContainerRegistry' },
-                @{ Name = 'Az.Resources' }
-            )
-
-            # Set agent up
-            Set-EnvironmentOnAgent -PSModules $Modules
-          
-
   - deployment: DeployARM
-    dependsOn: CreateResourceGroup
-    displayName: Deploy ARM template
+    displayName: Deploy
     condition: succeeded()
     environment: dev
-    variables:
-    - group: Release
     strategy:
       runOnce:
         deploy:
           steps:
           - checkout: self
+            fetchDepth: 0
           - download: current
             displayName: Download template
+
+          - task: PowerShell@2
+            displayName: 'Setup agent'
+            inputs:
+              targetType: inline
+              pwsh: true
+              script: |
+                # Load used functions
+                . (Join-Path '$(System.DefaultWorkingDirectory)' 'utilities' 'scripts' 'Set-EnvironmentOnAgent.ps1')
+
+                # Define PS modules to install on the runner
+                $Modules = @(
+                    @{ Name = 'Az.Accounts' },
+                    @{ Name = 'Az.ContainerRegistry' },
+                    @{ Name = 'Az.Resources' }
+                )
+
+                # Set agent up
+                Set-EnvironmentOnAgent -PSModules $Modules
+
+          - task: AzureCLI@2
+            displayName: Create Resource Group
+            inputs:
+              azureSubscription: $(azureServiceConnection)
+              scriptType: bash
+              scriptLocation: inlineScript
+              useGlobalConfig: false
+              inlineScript: |
+                az --version
+                az group create --name $(resourceGroupName) --location $(location)
+
           - task: AzurePowerShell@5
             displayName: Deploy ARM Template
             inputs:
-              azureSubscription: $(ServiceConnectionName)
-              pwsh: false
-              azurePowerShellVersion: 'LatestVersion'
-              ScriptType: 'FilePath'
-              ScriptPath: '$(Build.SourcesDirectory)/utilities/scripts/Deploy-BicepTemplate.ps1'
-              ScriptArguments:
-                -ResourceGroupName ${{ parameters.resourceGroupName }} `
-                -Location "$(deploymentDefaultLocation)" `
-                -TemplateFile  "${{ parameters.templateFilePath }}" `
-                -TemplateParameterFile "${{ parameters.templateParameterFilePath }}"
+              azureSubscription: $(azureServiceConnection)
+              errorActionPreference: stop
+              azurePowerShellVersion: LatestVersion
+              ScriptType: InlineScript
+              inline: |
+                # Load used functions
+                . (Join-Path '$(System.DefaultWorkingDirectory)' '$(pipelineFunctionsPath)' 'New-TemplateDeployment.ps1')
+
+                # Fetching parameters
+                $location = '$(location)'
+                $resourceGroupName = '${{ parameters.resourceGroupName }}'
+                $templateFilePath = '${{ parameters.templateFilePath }}'
+                $parameterFilePath = '${{ parameters.templateParameterFilePath }}'
+
+                Write-Verbose 'Invoke task with' -Verbose
+                Write-Verbose ($functionInput | ConvertTo-Json | Out-String) -Verbose
+
+                $functionInput = @{
+                    templateFilePath     = $templateFilePath
+                    parameterFilePath    = $parameterFilePath
+                    location             = $location
+                    resourceGroupName    = $resourceGroupName
+                    additionalParameters = @{}
+                }
+
+                $res = New-TemplateDeployment @functionInput -Verbose
+
+                # Get deployment name
+                $deploymentNames = $res.DeploymentNames | ConvertTo-Json -Compress
+                Write-Verbose "Deployment name(s) [$deploymentNames]" -Verbose
+                Write-Host "##vso[task.setvariable variable=deploymentNames]$deploymentNames"
+                Write-Host "##vso[task.setvariable variable=deploymentNames;isOutput=true]$deploymentNames"
+
+                # Populate further outputs
+                $deploymentOutputHashTable=@{}
+
+                foreach ($outputKey in $res.deploymentOutput.Keys) {
+                  Write-Output ('##vso[task.setvariable variable={0}]{1}' -f $outputKey, $res.deploymentOutput[$outputKey].Value)
+                  $deploymentOutputHashTable.add($outputKey,$res.deploymentOutput[$outputKey].Value)
+                }
+
+                $deploymentOutput = $deploymentOutputHashTable | ConvertTo-Json -Compress -Depth 100
+                Write-Verbose "Deployment output: $deploymentOutput" -Verbose
+
+                if ($res.ContainsKey('exception')) {
+                  # Happens only if there is an exception
+                  throw $res.exception
+                }

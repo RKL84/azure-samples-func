@@ -2,15 +2,7 @@ trigger:
 - '*'
 
 variables:
-- group: Release
-- name: buildConfiguration
-  value: Release
-- name: releaseBranchName
-  value: main
-- name: deploymentDefaultLocation
-  value: australiasoutheast
-- name: appName
-  value: azsample0411
+- template: vars/vars-global.yaml
 
 # schedules:
 # - cron: '0 3 * * *'
@@ -23,16 +15,19 @@ variables:
 stages:
   - stage: 'Build'
     displayName: 'Build'
+    variables:          
+      - template: vars/vars-dev.yaml
     jobs: 
-      - template: pipeline-templates/jobs.buildCode.yml
-      - template: pipeline-templates/jobs.buildInfra.yml
+      - template: /.azuredevops/pipeline-templates/jobs.buildInfra.yml
         parameters:
-          resourceGroupName: $(ResourceGroupName)
+          resourceGroupName: $(resourceGroupName)
           bicepTemplateFilePath: $(Build.SourcesDirectory)/deploy/main.bicep
           templateParameterFilePath: $(Build.SourcesDirectory)/deploy/parameters.dev.json
 
   - stage: 'Dev'
     displayName: 'Deploy to the dev environment'
+    variables:          
+      - template: vars/vars-dev.yaml
     dependsOn: Build
     condition: |
       and
@@ -41,29 +36,9 @@ stages:
         eq(variables['Build.SourceBranchName'], variables['releaseBranchName'])
       )
     jobs:
-    - job: CreateResourceGroup
-      displayName: Create Resource Group
-      steps:
-      
-      - task: AzureCLI@2
-        displayName: Create Resource Group
-        inputs:
-          azureSubscription: $(ServiceConnectionName)
-          scriptType: bash
-          scriptLocation: inlineScript
-          useGlobalConfig: false
-          inlineScript: |
-            az --version
-            az group create --name $(ResourceGroupName) --location $(deploymentDefaultLocation)
-
-    - template: pipeline-templates/jobs.deployInfra.yml
+    - template: /.azuredevops/pipeline-templates/jobs.deployInfra.yml
       parameters:
-        appName: func-$(appName)-dev
-        resourceGroupName: $(ResourceGroupName)
+        appName: func-$(appName)-$(environmentName)
+        resourceGroupName: $(resourceGroupName)
         templateFilePath: $(Pipeline.Workspace)/Bicep/main.json
         templateParameterFilePath: $(Build.SourcesDirectory)/deploy/parameters.dev.json
-    
-    - template: pipeline-templates/deploy-fapp.yml
-      parameters:
-        appName: func-$(appName)-dev
-        package: '$(Pipeline.Workspace)/FunctionApp/$(buildConfiguration)/*.zip'
