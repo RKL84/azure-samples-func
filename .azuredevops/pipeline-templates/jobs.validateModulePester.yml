@@ -67,8 +67,10 @@ parameters:
     default: '$(location)'
   - name: subscriptionId
     type: string
+    default: ''
   - name: managementGroupId
     type: string
+    default: ''
   - name: azurePowerShellVersion
     type: string
     default: 'latestVersion'
