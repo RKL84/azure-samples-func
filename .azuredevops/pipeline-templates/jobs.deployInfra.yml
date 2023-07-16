@@ -56,7 +56,7 @@
           - task: AzureCLI@2
             displayName: Create Resource Group
             inputs:
-              azureSubscription: $(azureServiceConnection)
+              azureSubscription: ${{ parameters.serviceConnection }}
               scriptType: bash
               scriptLocation: inlineScript
               useGlobalConfig: false
@@ -67,7 +67,7 @@
           - task: AzurePowerShell@5
             displayName: Deploy ARM Template
             inputs:
-              azureSubscription: $(azureServiceConnection)
+              azureSubscription: ${{ parameters.serviceConnection }}
               errorActionPreference: stop
               azurePowerShellVersion: LatestVersion
               ScriptType: InlineScript

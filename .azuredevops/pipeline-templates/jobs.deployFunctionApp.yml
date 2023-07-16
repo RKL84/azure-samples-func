@@ -3,6 +3,9 @@
     type: string
   - name: package
     type: string
+  - name: serviceConnection
+    type: string
+    default: '$(azureServiceConnection)'
 
   jobs:
   - deployment: UploadFunctionAppCode
@@ -20,7 +23,7 @@
           - task: AzureFunctionApp@1
             displayName: 'Azure App Service Deploy: function'
             inputs:
-              azureSubscription: $(azureServiceConnection)
+              azureSubscription: ${{ parameters.serviceConnection }}
               appName: ${{ parameters.appName}}
               appType: 'functionApp'
               package: '${{ parameters.package}}'
