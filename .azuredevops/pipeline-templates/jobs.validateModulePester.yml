@@ -46,7 +46,7 @@ parameters:
     type: string
   - name: templateTestFilePath
     type: string
-    default: 'utilities/pipelines/staticValidation/module.tests.ps1'
+    default: 'utilities/staticValidation/module.tests.ps1'
   - name: serviceConnection
     type: string
     default: '$(azureServiceConnection)'
@@ -146,16 +146,14 @@ jobs:
             # Build path
             # Set test input module path
             $moduleFolderPaths = @(Join-Path $repoRootPath '${{ parameters.templateFilePath }}')
-            # $moduleFolderPaths += (Get-ChildItem $moduleFolderPaths -Recurse -Directory -Force).FullName | Where-Object {
-            #   (Get-ChildItem $_ -File -Depth 0 -Include @('main.json', 'main.bicep') -Force).Count -gt 0
-            # }
+
             Write-Verbose "Execute tests in path(s):" -Verbose
             foreach($moduleFolderPath in $moduleFolderPaths) {
               Write-Verbose "- [($moduleFolderPath]" -Verbose
             }
 
             # Construct Token Configuration Input
-            $GlobalVariablesObject = Get-Content -Path (Join-Path '$(System.DefaultWorkingDirectory)' 'settings.yml') | ConvertFrom-Yaml | Select-Object -ExpandProperty variables
+            $GlobalVariablesObject = Get-Content -Path (Join-Path '$(System.DefaultWorkingDirectory)' 'pipeline-templates' 'vars' 'settings.yaml') | ConvertFrom-Yaml | Select-Object -ExpandProperty variables
             $tokenConfiguration = @{
                 Tokens      = @{}
                 TokenPrefix = $GlobalVariablesObject | Select-Object -ExpandProperty tokenPrefix
