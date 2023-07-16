@@ -58,7 +58,7 @@ stages:
         templateFilePath: $(Pipeline.Workspace)/Bicep/main.json
         templateParameterFilePath: $(Build.SourcesDirectory)/deploy/parameters.dev.json
 
-    - template: /.azuredevops/pipeline-templates/deploy-fapp.yml
+    - template: /.azuredevops/pipeline-templates/jobs.deployFunctionApp.yml
       parameters:
         appName: func-$(appName)-dev
         package: '$(Pipeline.Workspace)/FunctionApp/$(buildConfiguration)/*.zip'
