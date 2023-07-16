@@ -1,8 +1,15 @@
 trigger:
 - '*'
 
+parameters:
+  - name: staticValidation
+    displayName: Execute static validation
+    type: boolean
+    default: false
+    
 variables:
 - template: vars/vars-global.yaml
+
 
 # schedules:
 # - cron: '0 3 * * *'
@@ -18,11 +25,18 @@ stages:
     variables:          
       - template: vars/vars-dev.yaml
     jobs: 
+      - template: pipeline-templates/jobs.buildCode.yml     
       - template: /.azuredevops/pipeline-templates/jobs.buildInfra.yml
         parameters:
           resourceGroupName: $(resourceGroupName)
           bicepTemplateFilePath: $(Build.SourcesDirectory)/deploy/main.bicep
           templateParameterFilePath: $(Build.SourcesDirectory)/deploy/parameters.dev.json
+
+  # - stage: validation
+  #   displayName: Static validation
+  #   condition: eq('${{ parameters.staticValidation }}', 'True')
+  #   jobs:
+  #     - template: /.azuredevops/pipeline-templates/jobs.validateModulePester.yml
 
   - stage: 'Dev'
     displayName: 'Deploy to the dev environment'
@@ -36,9 +50,15 @@ stages:
         eq(variables['Build.SourceBranchName'], variables['releaseBranchName'])
       )
     jobs:
+
     - template: /.azuredevops/pipeline-templates/jobs.deployInfra.yml
       parameters:
         appName: func-$(appName)-$(environmentName)
         resourceGroupName: $(resourceGroupName)
         templateFilePath: $(Pipeline.Workspace)/Bicep/main.json
         templateParameterFilePath: $(Build.SourcesDirectory)/deploy/parameters.dev.json
+
+    - template: pipeline-templates/deploy-fapp.yml
+      parameters:
+        appName: func-$(appName)-dev
+        package: '$(Pipeline.Workspace)/FunctionApp/$(buildConfiguration)/*.zip'
