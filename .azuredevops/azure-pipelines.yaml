@@ -20,23 +20,26 @@ variables:
 #   always: false 
 
 stages:
+
+  - stage: validation
+    displayName: Static validation
+    condition: eq('${{ parameters.staticValidation }}', 'True')
+    jobs:
+      - template: /.azuredevops/pipeline-templates/jobs.validateModulePester.yml
+      
   - stage: 'Build'
     displayName: 'Build'
     variables:          
       - template: vars/vars-dev.yaml
     jobs: 
-      - template: /.azuredevops/pipeline-templates/jobs.buildCode.yml     
+      - template: /.azuredevops/pipeline-templates/jobs.buildCode.yml 
       - template: /.azuredevops/pipeline-templates/jobs.buildInfra.yml
         parameters:
           resourceGroupName: $(resourceGroupName)
           bicepTemplateFilePath: $(Build.SourcesDirectory)/deploy/main.bicep
           templateParameterFilePath: $(Build.SourcesDirectory)/deploy/parameters.dev.json
 
-  # - stage: validation
-  #   displayName: Static validation
-  #   condition: eq('${{ parameters.staticValidation }}', 'True')
-  #   jobs:
-  #     - template: /.azuredevops/pipeline-templates/jobs.validateModulePester.yml
+
 
   - stage: 'Dev'
     displayName: 'Deploy to the dev environment'
