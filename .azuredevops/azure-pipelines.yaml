@@ -23,45 +23,47 @@ stages:
 
   - stage: validation
     displayName: Static validation
-    condition: eq('${{ parameters.staticValidation }}', 'True')
+    # condition: eq('${{ parameters.staticValidation }}', 'True')
+    variables:          
+      - template: '../../settings.yml'
     jobs:
       - template: /.azuredevops/pipeline-templates/jobs.validateModulePester.yml
         parameters:
           templateFilePath: $(Pipeline.Workspace)/Bicep
 
-  - stage: 'Build'
-    displayName: 'Build'
-    variables:          
-      - template: vars/vars-dev.yaml
-    jobs: 
-      - template: /.azuredevops/pipeline-templates/jobs.buildCode.yml 
-      - template: /.azuredevops/pipeline-templates/jobs.buildInfra.yml
-        parameters:
-          resourceGroupName: $(resourceGroupName)
-          bicepTemplateFilePath: $(Build.SourcesDirectory)/deploy/main.bicep
-          templateParameterFilePath: $(Build.SourcesDirectory)/deploy/parameters.dev.json
+  # - stage: 'Build'
+  #   displayName: 'Build'
+  #   variables:          
+  #     - template: vars/vars-dev.yaml
+  #   jobs: 
+  #     - template: /.azuredevops/pipeline-templates/jobs.buildCode.yml 
+  #     - template: /.azuredevops/pipeline-templates/jobs.buildInfra.yml
+  #       parameters:
+  #         resourceGroupName: $(resourceGroupName)
+  #         bicepTemplateFilePath: $(Build.SourcesDirectory)/deploy/main.bicep
+  #         templateParameterFilePath: $(Build.SourcesDirectory)/deploy/parameters.dev.json
 
-  - stage: 'Dev'
-    displayName: 'Deploy to the dev environment'
-    variables:          
-      - template: vars/vars-dev.yaml
-    dependsOn: Build
-    condition: |
-      and
-      (
-        succeeded(),
-        eq(variables['Build.SourceBranchName'], variables['releaseBranchName'])
-      )
-    jobs:
+  # - stage: 'Dev'
+  #   displayName: 'Deploy to the dev environment'
+  #   variables:          
+  #     - template: vars/vars-dev.yaml
+  #   dependsOn: Build
+  #   condition: |
+  #     and
+  #     (
+  #       succeeded(),
+  #       eq(variables['Build.SourceBranchName'], variables['releaseBranchName'])
+  #     )
+  #   jobs:
 
-    - template: /.azuredevops/pipeline-templates/jobs.deployInfra.yml
-      parameters:
-        appName: func-$(appName)-$(environmentName)
-        resourceGroupName: $(resourceGroupName)
-        templateFilePath: $(Pipeline.Workspace)/Bicep/main.json
-        templateParameterFilePath: $(Build.SourcesDirectory)/deploy/parameters.dev.json
+  #   - template: /.azuredevops/pipeline-templates/jobs.deployInfra.yml
+  #     parameters:
+  #       appName: func-$(appName)-$(environmentName)
+  #       resourceGroupName: $(resourceGroupName)
+  #       templateFilePath: $(Pipeline.Workspace)/Bicep/main.json
+  #       templateParameterFilePath: $(Build.SourcesDirectory)/deploy/parameters.dev.json
 
-    - template: /.azuredevops/pipeline-templates/jobs.deployFunctionApp.yml
-      parameters:
-        appName: func-$(appName)-dev
-        package: '$(Pipeline.Workspace)/FunctionApp/$(buildConfiguration)/*.zip'
+  #   - template: /.azuredevops/pipeline-templates/jobs.deployFunctionApp.yml
+  #     parameters:
+  #       appName: func-$(appName)-dev
+  #       package: '$(Pipeline.Workspace)/FunctionApp/$(buildConfiguration)/*.zip'
