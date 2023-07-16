@@ -25,7 +25,7 @@ stages:
     variables:          
       - template: vars/vars-dev.yaml
     jobs: 
-      - template: pipeline-templates/jobs.buildCode.yml     
+      - template: /.azuredevops/pipeline-templates/jobs.buildCode.yml     
       - template: /.azuredevops/pipeline-templates/jobs.buildInfra.yml
         parameters:
           resourceGroupName: $(resourceGroupName)
@@ -58,7 +58,7 @@ stages:
         templateFilePath: $(Pipeline.Workspace)/Bicep/main.json
         templateParameterFilePath: $(Build.SourcesDirectory)/deploy/parameters.dev.json
 
-    - template: pipeline-templates/deploy-fapp.yml
+    - template: /.azuredevops/pipeline-templates/deploy-fapp.yml
       parameters:
         appName: func-$(appName)-dev
         package: '$(Pipeline.Workspace)/FunctionApp/$(buildConfiguration)/*.zip'
