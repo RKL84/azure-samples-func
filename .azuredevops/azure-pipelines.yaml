@@ -41,8 +41,6 @@ stages:
           bicepTemplateFilePath: $(Build.SourcesDirectory)/deploy/main.bicep
           templateParameterFilePath: $(Build.SourcesDirectory)/deploy/parameters.dev.json
 
-
-
   - stage: 'Dev'
     displayName: 'Deploy to the dev environment'
     variables:          
