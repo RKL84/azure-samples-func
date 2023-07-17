@@ -90,6 +90,7 @@ variables:
   vstsProject: '$(System.TeamProject)'
   modulesRepository: ResourceModules # The repository hosting the deployment code (i.e. 'Components'). MUST be provided as a variable with every pipeline
   azureServiceConnection: "AzureSamples"
+  pipelineFunctionsPath: 'utilities/scripts'
 
   #############################
   ##   Publishing settings   ##
