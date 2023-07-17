@@ -25,12 +25,16 @@ param appInsightsLocation string = resourceGroup().location
 @maxLength(13)
 param resourceNameSuffix string = uniqueString(resourceGroup().id)
 
-var applicationInsightsName = 'ain-${appName}-${resourceNameSuffix}-${env}'
 var appServicePlanName = 'asp-${appName}-${resourceNameSuffix}-${env}'
+var applicationInsightsName = 'ain-${appName}-${resourceNameSuffix}-${env}'
 var functionAppName = 'func-${appName}-${resourceNameSuffix}-${env}'
 var functionWorkerRuntime = runtime
-
 var buildNumber = uniqueString(resourceGroup().id)
+
+resource appServicePlan 'Microsoft.Web/serverfarms@2022-09-01' existing =  {
+  name: appServicePlanName
+  scope: resourceGroup(sharedResourceGroupName)
+}
 
 resource storageAccount 'Microsoft.Storage/storageAccounts@2021-06-01' existing = {
   name: storageAccountName
@@ -57,18 +61,6 @@ module applicationInsights 'br:acrshr0411.azurecr.io/bicep/modules/microsoft.ins
   }
 }
 
-module appServicePlan 'br:acrshr0411.azurecr.io/bicep/modules/microsoft.web.serverfarms:latest'= {
-  name: 'plandeploy-${buildNumber}'
-  params: {
-    name: appServicePlanName
-    location: location
-    sku: {
-      name: 'Y1'
-      tier: 'Dynamic'
-    }
-  }
-}
-
 module functionAppModule 'br:acrshr0411.azurecr.io/bicep/modules/microsoft.web.sites:latest' = {
   name: 'fapp-${buildNumber}'
   params: {
@@ -77,7 +69,7 @@ module functionAppModule 'br:acrshr0411.azurecr.io/bicep/modules/microsoft.web.s
     systemAssignedIdentity: true
     name: functionAppName
     location: location
-    serverFarmResourceId: appServicePlan.outputs.resourceId
+    serverFarmResourceId: appServicePlan.id
     storageAccountId: storageAccount.id
     appInsightId: applicationInsights.outputs.resourceId
     diagnosticWorkspaceId: logAnalytics.id
