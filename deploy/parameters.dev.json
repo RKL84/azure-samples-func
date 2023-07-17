@@ -5,6 +5,9 @@
       "env": {
         "value": "dev"
       },
+      "resourceNameSuffix": {
+        "value": "0411"
+      },
       "storageAccountName": {
         "value": "stazshared0411dev"
       },

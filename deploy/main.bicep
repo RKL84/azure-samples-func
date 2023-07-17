@@ -25,11 +25,10 @@ param appInsightsLocation string = resourceGroup().location
 @maxLength(13)
 param resourceNameSuffix string = uniqueString(resourceGroup().id)
 
-
-var appServicePlanName = '${appName}-plan'
-var functionAppName = 'func-${appName}-${env}'
+var applicationInsightsName = 'ain-${appName}-${resourceNameSuffix}-${env}'
+var appServicePlanName = 'asp-${appName}-${resourceNameSuffix}-${env}'
+var functionAppName = 'func-${appName}-${resourceNameSuffix}-${env}'
 var functionWorkerRuntime = runtime
-var applicationInsightsName = appName
 
 var buildNumber = uniqueString(resourceGroup().id)
 
@@ -71,7 +70,7 @@ module appServicePlan 'br:acrshr0411.azurecr.io/bicep/modules/microsoft.web.serv
 }
 
 module functionAppModule 'br:acrshr0411.azurecr.io/bicep/modules/microsoft.web.sites:latest' = {
-  name: '${uniqueString(deployment().name, location)}-test-wsfamin'
+  name: 'fapp-${buildNumber}'
   params: {
     // Required parameters
     kind: 'functionapp'
