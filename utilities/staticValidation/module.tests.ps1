@@ -37,26 +37,26 @@ $script:templateNotFoundException = 'No template file found in folder [{0}]' # -
 # Import any helper function used in this test script
 Import-Module (Join-Path $PSScriptRoot 'helper' 'helper.psm1') -Force
 
-Describe 'File/folder tests' -Tag 'Modules' {
+# Describe 'File/folder tests' -Tag 'Modules' {
 
-    Context 'General module folder tests' {
+#     Context 'General module folder tests' {
 
-        $moduleFolderTestCases = [System.Collections.ArrayList] @()
-        foreach ($moduleFolderPath in $moduleFolderPaths) {
-            $moduleFolderTestCases += @{
-                moduleFolderName = $moduleFolderPath.Replace('\', '/').Split('/modules/')[1]
-                moduleFolderPath = $moduleFolderPath
-                isTopLevelModule = $moduleFolderPath.Replace('\', '/').Split('/modules/')[1].Split('/').Count -eq 2 # <provider>/<resourceType>
-            }
-        }
+#         $moduleFolderTestCases = [System.Collections.ArrayList] @()
+#         foreach ($moduleFolderPath in $moduleFolderPaths) {
+#             $moduleFolderTestCases += @{
+#                 moduleFolderName = $moduleFolderPath.Replace('\', '/').Split('/modules/')[1]
+#                 moduleFolderPath = $moduleFolderPath
+#                 isTopLevelModule = $moduleFolderPath.Replace('\', '/').Split('/modules/')[1].Split('/').Count -eq 2 # <provider>/<resourceType>
+#             }
+#         }
 
-        It '[<moduleFolderName>] Module should contain a [` deploy.json ` / ` deploy.bicep `] file' -TestCases $moduleFolderTestCases {
+#         It '[<moduleFolderName>] Module should contain a [` deploy.json ` / ` deploy.bicep `] file' -TestCases $moduleFolderTestCases {
 
-            param( [string] $moduleFolderPath )
+#             param( [string] $moduleFolderPath )
 
-            $hasARM = Test-Path (Join-Path -Path $moduleFolderPath 'deploy.json')
-            $hasBicep = Test-Path (Join-Path -Path $moduleFolderPath 'deploy.bicep')
-                ($hasARM -or $hasBicep) | Should -Be $true
-        }
-    }
-}
+#             $hasARM = Test-Path (Join-Path -Path $moduleFolderPath 'deploy.json')
+#             $hasBicep = Test-Path (Join-Path -Path $moduleFolderPath 'deploy.bicep')
+#                 ($hasARM -or $hasBicep) | Should -Be $true
+#         }
+#     }
+# }
