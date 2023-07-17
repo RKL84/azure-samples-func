@@ -147,7 +147,7 @@ jobs:
             }
 
             # Construct Token Configuration Input
-            $GlobalVariablesObject = Get-Content -Path (Join-Path '$(System.DefaultWorkingDirectory)' '.azuredevops' 'pipeline-templates' 'vars' 'vars-settings.yaml') | ConvertFrom-Yaml | Select-Object -ExpandProperty variables
+            $GlobalVariablesObject = Get-Content -Path (Join-Path '$(System.DefaultWorkingDirectory)' '.azuredevops' 'vars' 'vars-settings.yaml') | ConvertFrom-Yaml | Select-Object -ExpandProperty variables
             $tokenConfiguration = @{
                 Tokens      = @{}
                 TokenPrefix = $GlobalVariablesObject | Select-Object -ExpandProperty tokenPrefix
