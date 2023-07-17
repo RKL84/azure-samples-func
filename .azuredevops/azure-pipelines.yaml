@@ -9,6 +9,7 @@ parameters:
     
 variables:
 - template: vars/vars-global.yaml
+- template: vars/vars-settings.yaml   
 
 
 # schedules:
@@ -22,7 +23,7 @@ variables:
 stages:
   - stage: 'Build'
     displayName: 'Build'
-    variables:          
+    variables:
       - template: vars/vars-dev.yaml
     jobs: 
       - template: /.azuredevops/pipeline-templates/jobs.buildCode.yml 
@@ -35,8 +36,6 @@ stages:
   - stage: 'Validation'
     displayName: Static validation
     condition: eq('${{ parameters.staticValidation }}', 'True')
-    variables:          
-      - template: vars/vars-settings.yaml
     dependsOn: Build
     jobs:
       - template: /.azuredevops/pipeline-templates/jobs.validateTemplatePester.yml

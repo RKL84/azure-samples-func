@@ -44,7 +44,7 @@ variables:
   # Deployment validation #
   # --------------------- #
 
-  location: 'Australia Southeast' # The default location to test deploy resources to
+  location: 'australiasoutheast' # The default location to test deploy resources to
 
   #############################
   ##   Publishing settings   ##
@@ -60,7 +60,7 @@ variables:
 
   templateSpecsDoPublish: true # Set to true, if you would like to publish module templates as template specs
   templateSpecsRGName: 'azure-samples-rg' # The name of the resource group to publish to. If the resource group does not exist, it will be created.
-  templateSpecsRGLocation: 'Australia Southeast' # The location of the resource group to publish to
+  templateSpecsRGLocation: 'australiasoutheast' # The location of the resource group to publish to
   templateSpecsDescription: components # The description to add to template specs published by this platform
 
   # ------------------------------- #
@@ -70,7 +70,7 @@ variables:
   bicepRegistryDoPublish: true # Set to true, if you would like to publish module templates to a bicep registry
   bicepRegistryName: acrshr0411 # The name of the bicep registry (ACR) to publish to. If it does not exist, it will be created.
   bicepRegistryRGName: 'azure-shared-rg' # The resource group that hosts the private bicep registry (ACR)
-  bicepRegistryRgLocation: 'Australia Southeast' # The location of the resource group to publish to
+  bicepRegistryRgLocation: 'australiasoutheast' # The location of the resource group to publish to
 
   ###########################################################################################################################
   ################################################## Azure DevOps Only ######################################################
@@ -89,7 +89,7 @@ variables:
   vstsOrganizationURI: '$(System.CollectionUri)' # The URI of the TFS collection or Azure DevOps organization. For example: https://dev.azure.com/fabrikam/.
   vstsProject: '$(System.TeamProject)'
   modulesRepository: ResourceModules # The repository hosting the deployment code (i.e. 'Components'). MUST be provided as a variable with every pipeline
-  pipelineFunctionsPath: 'utilities/pipelines'
+  azureServiceConnection: "AzureSamples"
 
   #############################
   ##   Publishing settings   ##
@@ -115,3 +115,5 @@ variables:
 #   - name: preferredAzurePowerShellVersion
 #     value: '4.4.0'
 #
+  releaseBranchName: 'main'
+  buildConfiguration: 'Release'
