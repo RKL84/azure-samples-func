@@ -10,6 +10,7 @@
   - template: /.azuredevops/pipeline-templates/jobs.deployInfra.yml
     parameters:
       appName: func-${{ parameters.appName }}-${{ parameters.environment }}
+      environment: ${{ parameters.environment }}
       resourceGroupName: ${{ parameters.resourceGroupName }}
       templateFilePath: $(Pipeline.Workspace)/Bicep/main.json
       templateParameterFilePath: $(Build.SourcesDirectory)/deploy/parameters.${{ parameters.environment }}.json

@@ -13,6 +13,8 @@
   - name: location
     type: string
     default: '$(location)'
+  - name: environment
+    type: string
   # - name: poolName
   #   type: string
   #   default: '$(poolName)'
@@ -27,7 +29,7 @@
   - deployment: DeployARM
     displayName: Deploy
     condition: succeeded()
-    environment: dev
+    environment: ${{ parameters.environment }}
     strategy:
       runOnce:
         deploy:
