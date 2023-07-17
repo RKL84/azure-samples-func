@@ -21,9 +21,6 @@
             az bicep restore --file ${{ parameters.bicepTemplateFilePath}}
             az bicep build --file ${{ parameters.bicepTemplateFilePath}} --outfile $(Build.ArtifactStagingDirectory)/main.json
 
-      - publish: '$(Build.ArtifactStagingDirectory)/main.json'
-        artifact: Bicep
-
       - task: AzureResourceManagerTemplateDeployment@3
         name: RunPreflightValidation
         displayName: Run preflight validation
@@ -35,3 +32,6 @@
           csmFile: ${{ parameters.bicepTemplateFilePath}}
           csmParametersFile: ${{ parameters.templateParameterFilePath }}
           overrideParameters: -appName $(appName)
+
+      - publish: '$(Build.ArtifactStagingDirectory)/main.json'
+        artifact: Bicep
