@@ -10,6 +10,9 @@
   - name: serviceConnection
     type: string
     default: '$(azureServiceConnection)'
+  - name: location
+    type: string
+    default: '$(location)'
   # - name: poolName
   #   type: string
   #   default: '$(poolName)'
@@ -62,7 +65,7 @@
               useGlobalConfig: false
               inlineScript: |
                 az --version
-                az group create --name $(resourceGroupName) --location $(location)
+                az group create --name $(resourceGroupName) --location ${{ parameters.location }}
 
           - task: AzurePowerShell@5
             displayName: Deploy ARM Template
@@ -76,7 +79,7 @@
                 . (Join-Path '$(System.DefaultWorkingDirectory)' '$(pipelineFunctionsPath)' 'New-TemplateDeployment.ps1')
 
                 # Fetching parameters
-                $location = '$(location)'
+                $location = '${{ parameters.location }}'
                 $resourceGroupName = '${{ parameters.resourceGroupName }}'
                 $templateFilePath = '${{ parameters.templateFilePath }}'
                 $parameterFilePath = '${{ parameters.templateParameterFilePath }}'
