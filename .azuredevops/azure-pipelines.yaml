@@ -53,16 +53,10 @@ stages:
         succeeded(),
         eq(variables['Build.SourceBranchName'], variables['releaseBranchName'])
       )
+
     jobs:
-
-    - template: /.azuredevops/pipeline-templates/jobs.deployInfra.yml
+    - template: /.azuredevops/pipeline-templates/jobs.deploy.yml
       parameters:
-        appName: func-$(appName)-$(environmentName)
+        environment: 'dev'
+        appName: $(appName)
         resourceGroupName: $(resourceGroupName)
-        templateFilePath: $(Pipeline.Workspace)/Bicep/main.json
-        templateParameterFilePath: $(Build.SourcesDirectory)/deploy/parameters.dev.json
-
-    - template: /.azuredevops/pipeline-templates/jobs.deployFunctionApp.yml
-      parameters:
-        appName: func-$(appName)-dev
-        package: '$(Pipeline.Workspace)/FunctionApp/$(buildConfiguration)/*.zip'

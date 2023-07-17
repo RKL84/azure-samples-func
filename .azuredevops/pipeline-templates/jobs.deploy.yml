@@ -1,0 +1,20 @@
+  parameters:
+  - name: environment
+    type: string
+  - name: appName
+    type: string
+  - name: resourceGroupName
+    type: string
+
+  jobs:
+  - template: /.azuredevops/pipeline-templates/jobs.deployInfra.yml
+    parameters:
+      appName: func-${{ parameters.appName }}-${{ parameters.environment }}
+      resourceGroupName: ${{ parameters.resourceGroupName }}
+      templateFilePath: $(Pipeline.Workspace)/Bicep/main.json
+      templateParameterFilePath: $(Build.SourcesDirectory)/deploy/parameters.${{ parameters.environment }}.json
+
+  - template: /.azuredevops/pipeline-templates/jobs.deployFunctionApp.yml
+    parameters:
+      appName: func-${{ parameters.appName }}-${{ parameters.environment }}
+      package: '$(Pipeline.Workspace)/FunctionApp/$(buildConfiguration)/*.zip'

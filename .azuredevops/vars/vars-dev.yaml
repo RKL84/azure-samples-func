@@ -1,4 +1,4 @@
 variables:
   environmentName: "dev"
-  resourceGroupName: "azure-samples-rg"
+  resourceGroupName: "azure-samples-dev-rg"
   azureServiceConnection: "AzureSamples"
