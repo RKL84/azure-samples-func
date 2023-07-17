@@ -9,16 +9,16 @@
         "value": "0411"
       },
       "storageAccountName": {
-        "value": "stazshared0411dev"
+        "value": "stazshared0411qa"
       },
       "sharedResourceGroupName": {
-        "value": "azure-shared-rg"
+        "value": "azshared-qa-rg"
       },
       "keyVaultName": {
-        "value": "kv-azshared0411-dev"
+        "value": "kv-azshared-0411-qa"
       },
       "logAnalyticsWorkspaceName": {
-        "value": "lwazshared0411"
+        "value": "lw-azshared-0411-qa"
       }
     }
   }
