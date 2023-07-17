@@ -20,14 +20,13 @@ variables:
 #   always: false 
 
 stages:
-
   - stage: validation
     displayName: Static validation
     # condition: eq('${{ parameters.staticValidation }}', 'True')
     variables:          
       - template: vars/vars-settings.yaml
     jobs:
-      - template: /.azuredevops/pipeline-templates/jobs.validateModulePester.yml
+      - template: /.azuredevops/pipeline-templates/jobs.validateTemplatePester.yml
         parameters:
           templateFilePath: $(Build.SourcesDirectory)/deploy
 

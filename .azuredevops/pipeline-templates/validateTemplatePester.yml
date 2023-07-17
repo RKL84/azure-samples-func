@@ -77,12 +77,6 @@ parameters:
   - name: preferredAzurePowerShellVersion
     type: string
     default: ''
-  # subscriptionId: '$(ARM_SUBSCRIPTION_ID)'
-  # managementGroupId: '$(ARM_MGMTGROUP_ID)'
-  # modulesRepository: '$(modulesRepository)'
-  # # Azure PowerShell Version parameter
-  # azurePowerShellVersion: '$(azurePowerShellVersion)'
-  # preferredAzurePowerShellVersion: '$(preferredAzurePowerShellVersion)'
 
 ##---------------------------------------------##
 ## TEMPLATE LOGIC                              ##
