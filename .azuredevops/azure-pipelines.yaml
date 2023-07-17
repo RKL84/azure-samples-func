@@ -60,3 +60,16 @@ stages:
         environment: 'dev'
         appName: $(appName)
         resourceGroupName: $(resourceGroupName)
+
+  - stage: 'QA'
+    displayName: 'Deploy to the qa environment'
+    variables:          
+      - template: vars/vars-qa.yaml
+    dependsOn: Dev
+    jobs:
+    - template: /.azuredevops/pipeline-templates/jobs.deploy.yml
+      parameters:
+        environment: 'qa'
+        appName: $(appName)
+        resourceGroupName: $(resourceGroupName)
+
