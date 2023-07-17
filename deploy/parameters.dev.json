@@ -12,13 +12,13 @@
         "value": "stazshared0411dev"
       },
       "sharedResourceGroupName": {
-        "value": "azure-shared-rg"
+        "value": "azshared-dev-rg"
       },
       "keyVaultName": {
-        "value": "kv-azshared0411-dev"
+        "value": "kv-azshared-0411-dev"
       },
       "logAnalyticsWorkspaceName": {
-        "value": "lwazshared0411"
+        "value": "lw-azshared-0411-dev"
       }
     }
   }
