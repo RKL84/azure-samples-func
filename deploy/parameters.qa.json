@@ -14,11 +14,14 @@
       "sharedResourceGroupName": {
         "value": "azshared-qa-rg"
       },
+      "platformResourceGroupName": {
+        "value": "azplatform-rg"
+      },
       "keyVaultName": {
         "value": "kv-azshared-0411-qa"
       },
       "logAnalyticsWorkspaceName": {
-        "value": "lw-azshared-0411-qa"
+        "value": "lw-azplatform-0411"
       }
     }
   }

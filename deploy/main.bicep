@@ -17,6 +17,7 @@ param keyVaultName string
 param storageAccountName string
 param logAnalyticsWorkspaceName string
 param sharedResourceGroupName string
+param platformResourceGroupName string
 
 @description('Location for Application Insights')
 param appInsightsLocation string = resourceGroup().location
@@ -49,7 +50,7 @@ resource keyVault 'Microsoft.KeyVault/vaults@2023-02-01' existing =  {
 
 resource logAnalytics 'Microsoft.OperationalInsights/workspaces@2022-10-01' existing = {
   name: logAnalyticsWorkspaceName
-  scope: resourceGroup(sharedResourceGroupName)
+  scope: resourceGroup(platformResourceGroupName)
 }
 
 module applicationInsights 'br:acrshr0411.azurecr.io/bicep/modules/microsoft.insights.components:latest' = {
