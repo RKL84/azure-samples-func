@@ -17,5 +17,5 @@
 
   - template: /.azuredevops/pipeline-templates/jobs.deployFunctionApp.yml
     parameters:
-      appName: func-${{ parameters.appName }}-${{ parameters.environment }}
+      functionAppName: func-${{ parameters.appName }}-0411-${{ parameters.environment }}
       package: '$(Pipeline.Workspace)/FunctionApp/$(buildConfiguration)/*.zip'

@@ -1,5 +1,5 @@
   parameters:
-  - name: appName
+  - name: functionAppName
     type: string
   - name: package
     type: string
@@ -24,7 +24,7 @@
             displayName: 'Azure App Service Deploy: function'
             inputs:
               azureSubscription: ${{ parameters.serviceConnection }}
-              appName: ${{ parameters.appName}}
+              appName: ${{ parameters.functionAppName}}
               appType: 'functionApp'
               package: '${{ parameters.package}}'
               deploymentMethod: 'zipDeploy' 
