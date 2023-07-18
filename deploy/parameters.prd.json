@@ -17,6 +17,9 @@
       "platformResourceGroupName": {
         "value": "azplatform-rg"
       },
+      "appServicePlanName": {
+        "value": "asp-azshared-0411-prd"
+      },
       "keyVaultName": {
         "value": "kv-azshared-0411-prd"
       },
