@@ -44,6 +44,7 @@
         publishWebProjects: false
         arguments: '--no-build --configuration $(buildConfiguration) --output $(Build.ArtifactStagingDirectory)/$(buildConfiguration)'
         zipAfterPublish: true
+        workingDirectory: 'src'
   
     - publish: '$(Build.ArtifactStagingDirectory)'
       artifact: FunctionApp
